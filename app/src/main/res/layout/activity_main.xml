@@ -21,7 +21,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/serial_port_label"/>
+                android:text="@string/serial_port_label"
+                android:textSize="@dimen/activity_font_size"/>
 
             <Spinner
                 android:id="@+id/serial_port_list"
@@ -35,7 +36,8 @@
             android:id="@+id/connect_device_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/connect_serial_label"/>
+            android:text="@string/connect_serial_label"
+            android:textSize="@dimen/activity_font_size"/>
 
         <ListView
             android:id="@+id/spectrum_list"
@@ -48,7 +50,7 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="5"
+        android:layout_weight="3"
         android:orientation="vertical">
 
         <LinearLayout
@@ -60,18 +62,21 @@
                 android:id="@+id/save_light_spectrum_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/save_light_spectrum_label"/>
+                android:text="@string/save_light_spectrum_label"
+                android:textSize="@dimen/activity_font_size"/>
 
             <Button
                 android:id="@+id/save_dark_spectrum_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/save_dark_spectrum_label"/>
+                android:text="@string/save_dark_spectrum_label"
+                android:textSize="@dimen/activity_font_size"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/auto_read_spectrum_label"/>
+                android:text="@string/auto_read_spectrum_label"
+                android:textSize="@dimen/activity_font_size"/>
 
             <Switch
                 android:id="@+id/toggle_auto_read_spectrum_btn"

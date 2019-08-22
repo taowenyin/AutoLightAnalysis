@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--默认内边距-->
     <dimen name="activity_padding">20dp</dimen>
+    <!--默认字体大小-->
+    <dimen name="activity_font_size">8sp</dimen>
 </resources>
