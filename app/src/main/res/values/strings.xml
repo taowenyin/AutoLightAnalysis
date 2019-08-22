@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AutoLightAnalysis</string>
+    <string name="app_name">无损检测系统</string>
 
     <string name="serial_port_label">端口号：</string>
     <string name="connect_serial_label">链接设备</string>
