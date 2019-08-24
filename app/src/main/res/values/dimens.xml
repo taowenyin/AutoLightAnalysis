@@ -2,7 +2,9 @@
 <resources>
     <!--默认内边距-->
     <dimen name="activity_padding">5dp</dimen>
-    <dimen name="activity_padding_0">0dp</dimen>
+    <dimen name="activity_margin_padding_0">0dp</dimen>
     <!--默认字体大小-->
     <dimen name="activity_font_size">8sp</dimen>
+    <!--线性图表的标题-->
+    <dimen name="line_chart_description_font_size">8sp</dimen>
 </resources>

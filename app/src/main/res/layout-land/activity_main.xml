@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:paddingRight="@dimen/activity_padding"
     android:paddingLeft="@dimen/activity_padding"
-    android:paddingBottom="@dimen/activity_padding"
+    android:orientation="horizontal"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -16,12 +16,13 @@
         android:orientation="vertical"
         android:paddingRight="@dimen/activity_padding">
 
-        <Button
+        <ToggleButton
             android:id="@+id/connect_device_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/connect_serial_label"
-            android:textSize="@dimen/activity_font_size"/>
+            android:checked="false"
+            android:textOn="@string/connect_serial_toggle_on_label"
+            android:textOff="@string/connect_serial_toggle_off_label"/>
 
         <ListView
             android:id="@+id/spectrum_list"
@@ -34,7 +35,7 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="4"
+        android:layout_weight="5"
         android:orientation="vertical">
 
         <LinearLayout
@@ -58,6 +59,14 @@
                 android:text="@string/save_dark_spectrum_label"
                 android:textSize="@dimen/activity_font_size"/>
 
+            <Button
+                android:id="@+id/read_spectrum_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="@string/read_spectrum_label"
+                android:textSize="@dimen/activity_font_size"/>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -75,7 +84,7 @@
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/spectrum_line_chart"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"/>
 
     </LinearLayout>
 

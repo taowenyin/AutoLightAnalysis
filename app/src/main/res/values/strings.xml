@@ -2,10 +2,17 @@
     <string name="app_name">无损检测系统</string>
 
     <string name="serial_port_label">端口号：</string>
-    <string name="connect_serial_label">链接设备</string>
+    <string name="connect_serial_toggle_on_label">断开</string>
+    <string name="connect_serial_toggle_off_label">连接</string>
     <string name="save_light_spectrum_label">保存白光谱</string>
     <string name="save_dark_spectrum_label">保存暗光谱</string>
+    <string name="read_spectrum_label">读取光谱</string>
     <string name="auto_read_spectrum_label">自动读取光谱</string>
+
+    <string name="light_spectrum_legend">白光谱</string>
+    <string name="dark_spectrum_legend">暗光谱</string>
+    <string name="line_chart_no_data">暂无数据</string>
+    <string name="line_chart_description">无损检测光谱</string>
 
     <string-array name="serial_port_list_value">
         <item>COM1</item>
