@@ -1,6 +1,5 @@
 package siso.edu.cn.autolightanalysis;
 
-import android.graphics.DashPathEffect;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -9,33 +8,30 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.ToggleButton;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.github.mikephil.charting.utils.MPPointF;
 import com.google.android.things.pio.PeripheralManager;
 import com.google.android.things.pio.UartDevice;
 import com.google.android.things.pio.UartDeviceCallback;
 import com.google.common.primitives.Bytes;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Skeleton of an Android Things activity.
@@ -66,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
     private Button saveDarkSpectrumBtn = null;
     private Button readSpectrumBtn = null;
     private Switch toggleAutoReadSpectrumBtn = null;
+    private EditText toggleAutoReadSpectrumIntervalEdt = null;
     private LineChart spectrumLineChart = null;
 
     private UartDevice uartDevice = null;
@@ -75,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
     private List<Entry> lightSpectrumData = new ArrayList<Entry>();
     // 创建暗光谱数据集和数据线
     private List<Entry> darkSpectrumData = new ArrayList<Entry>();
+    // 创建普通光谱数据集和数据线
+    private List<Entry> normalSpectrumData = new ArrayList<Entry>();
     // 折线图数据集
     private List<ILineDataSet> spectrumDataSets = new ArrayList<ILineDataSet>();
 
@@ -82,6 +81,10 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
     private List<Byte> serialDataBuffer = new ArrayList<Byte>();
     // 串口数据异步传输
     private Handler serialHandler = new SerialHandler(this);
+
+    // 自动读取频谱数据的定时器
+    private Timer readTimer = null;
+    private TimerTask readTimerTask = null;
 
     // 保存当前的指令
     private String currentCommand = StringUtils.EMPTY;
@@ -96,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         saveDarkSpectrumBtn = findViewById(R.id.save_dark_spectrum_btn);
         readSpectrumBtn = findViewById(R.id.read_spectrum_btn);
         toggleAutoReadSpectrumBtn = findViewById(R.id.toggle_auto_read_spectrum_btn);
+        toggleAutoReadSpectrumIntervalEdt = findViewById(R.id.toggle_auto_read_spectrum_interval_edt);
         spectrumLineChart = findViewById(R.id.spectrum_line_chart);
 
         LineDataSet lightSpectrumSet = new LineDataSet(lightSpectrumData, getResources().getString(R.string.light_spectrum_legend));
@@ -142,9 +146,32 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         // 设置折线图为弧线
         darkSpectrumSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
 
+        LineDataSet normalSpectrumData = new LineDataSet(darkSpectrumData, getResources().getString(R.string.dark_spectrum_legend));
+        // 设置数据线的颜色
+        normalSpectrumData.setColor(getResources().getColor(R.color.colorBlue, getTheme()));
+        // 设置数据线的线宽
+        normalSpectrumData.setLineWidth(2f);
+        // 设置数据点的颜色
+        normalSpectrumData.setCircleColor(getResources().getColor(R.color.colorBlue, getTheme()));
+        // 设置数据点的半径
+        normalSpectrumData.setCircleRadius(4f);
+        // 不绘制空心圆
+        normalSpectrumData.setDrawCircleHole(false);
+        // 设置数据点的文字大小
+        normalSpectrumData.setValueTextSize(10f);
+        // 不对折线图进行填充
+        normalSpectrumData.setDrawFilled(false);
+        // 图例的高度
+        normalSpectrumData.setFormLineWidth(3f);
+        // 图例的宽度
+        normalSpectrumData.setFormSize(8f);
+        // 设置折线图为弧线
+        normalSpectrumData.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+
         // 添加数据线
         spectrumDataSets.add(lightSpectrumSet);
         spectrumDataSets.add(darkSpectrumSet);
+        spectrumDataSets.add(normalSpectrumData);
         // 折线图数据集
         LineData spectrumLineData = new LineData(spectrumDataSets);
         // 折线图显示数据
@@ -221,6 +248,7 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
                         toggleAutoReadSpectrumBtn.setChecked(false);
                         toggleAutoReadSpectrumBtn.setEnabled(false);
                         readSpectrumBtn.setEnabled(false);
+                        toggleAutoReadSpectrumIntervalEdt.setEnabled(false);
                     } catch (IOException e) {
                         Log.w(TAG, "Unable to close UART device", e);
                     }
@@ -238,37 +266,19 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         saveDarkSpectrumBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                LineDataSet lightDataSet = (LineDataSet) spectrumLineChart.getData().getDataSetByIndex(0);
-//                lightSpectrumData.add(new Entry(0, 2));
-//                lightSpectrumData.add(new Entry(1, 4));
-//                lightSpectrumData.add(new Entry(2, 3));
-//                lightSpectrumData.add(new Entry(3, 4));
-//                lightDataSet.setValues(lightSpectrumData);
-//
-//                LineDataSet darkDataSet = (LineDataSet) spectrumLineChart.getData().getDataSetByIndex(1);
-//                darkSpectrumData.add(new Entry(0, 4));
-//                darkSpectrumData.add(new Entry(1, 8));
-//                darkSpectrumData.add(new Entry(2, 6));
-//                darkSpectrumData.add(new Entry(3, 8));
-//                darkDataSet.setValues(darkSpectrumData);
-//
-//                spectrumLineChart.getData().notifyDataChanged();
-//                spectrumLineChart.notifyDataSetChanged();
-//                spectrumLineChart.invalidate();
+
             }
         });
 
         readSpectrumBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    // 发送读取光谱的指令
-                    uartDevice.write(Command.READ_SPECTRUM.getBytes(), Command.READ_INTERNAL_TEMPERATURE.getBytes().length);
-                    // 设置当前指令类型
-                    currentCommand = Command.READ_SPECTRUM;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
+                // 发送读取光谱的指令
+                new SerialAsyncTask(uartDevice).execute(Command.READ_SPECTRUM);
+
+                // 设置当前指令类型
+                currentCommand = Command.READ_SPECTRUM;
             }
         });
 
@@ -277,8 +287,16 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     readSpectrumBtn.setEnabled(false);
+                    toggleAutoReadSpectrumIntervalEdt.setEnabled(true);
+
+                    // 开始自动读取
+                    startReadTimer();
                 } else {
                     readSpectrumBtn.setEnabled(true);
+                    toggleAutoReadSpectrumIntervalEdt.setEnabled(false);
+
+                    // 停止自动读取
+                    stopReadTimer();
                 }
             }
         });
@@ -328,12 +346,58 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         return darkSpectrumData;
     }
 
+    public List<Entry> getNormalSpectrumData() {
+        return normalSpectrumData;
+    }
+
     public List<ILineDataSet> getSpectrumDataSets() {
         return spectrumDataSets;
     }
 
     public LineChart getSpectrumLineChart() {
         return spectrumLineChart;
+    }
+
+    // 启动自动读取定时器
+    private void startReadTimer() {
+        if (readTimer == null) {
+            readTimer = new Timer();
+        }
+
+        if (readTimerTask == null) {
+            readTimerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        // 发送读取光谱的指令
+                        uartDevice.write(Command.READ_SPECTRUM.getBytes(), Command.READ_INTERNAL_TEMPERATURE.getBytes().length);
+                        // 设置当前指令类型
+                        currentCommand = Command.READ_SPECTRUM;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+        }
+
+        if (readTimer != null && readTimerTask != null) {
+            readTimer.schedule(readTimerTask, 0, Integer.valueOf(
+                    toggleAutoReadSpectrumIntervalEdt.getText().toString().equals(StringUtils.EMPTY) ?
+                            "10000" : toggleAutoReadSpectrumIntervalEdt.getText().toString()));
+        }
+    }
+
+    // 停止自动读取定时器
+    private void stopReadTimer() {
+        if (readTimer != null) {
+            readTimer.cancel();
+            readTimer = null;
+        }
+
+        if (readTimerTask != null) {
+            readTimerTask.cancel();
+            readTimerTask = null;
+        }
     }
 
     @Override

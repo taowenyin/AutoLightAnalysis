@@ -29,7 +29,7 @@ public class SerialHandler extends Handler {
         // 清空数据
         switch (msg.what) {
             case READ_SPECTRUM:
-                activity.getLightSpectrumData().clear();
+                activity.getNormalSpectrumData().clear();
                 break;
             case LIGHT_SPECTRUM:
                 break;
@@ -48,7 +48,7 @@ public class SerialHandler extends Handler {
 
             switch (msg.what) {
                 case READ_SPECTRUM:
-                    activity.getLightSpectrumData().add(new Entry(i, data));
+                    activity.getNormalSpectrumData().add(new Entry(i, data));
                     break;
                 case LIGHT_SPECTRUM:
                     break;
@@ -60,8 +60,8 @@ public class SerialHandler extends Handler {
         // 设置图表数据
         switch (msg.what) {
             case READ_SPECTRUM:
-                LineDataSet lightDataSet = (LineDataSet) activity.getSpectrumLineChart().getData().getDataSetByIndex(0);
-                lightDataSet.setValues(activity.getLightSpectrumData());
+                LineDataSet lightDataSet = (LineDataSet) activity.getSpectrumLineChart().getData().getDataSetByIndex(2);
+                lightDataSet.setValues(activity.getNormalSpectrumData());
                 break;
             case LIGHT_SPECTRUM:
                 break;

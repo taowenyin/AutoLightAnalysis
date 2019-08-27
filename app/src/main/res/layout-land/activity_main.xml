@@ -79,6 +79,16 @@
                 android:enabled="false"
                 android:layout_height="wrap_content" />
 
+            <EditText
+                android:id="@+id/toggle_auto_read_spectrum_interval_edt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:enabled="false"
+                android:hint="@string/auto_read_spectrum_hint_label"
+                android:autofillHints="@string/auto_read_spectrum_hint_label"
+                android:textSize="@dimen/activity_font_size"/>
+
         </LinearLayout>
 
         <com.github.mikephil.charting.charts.LineChart
