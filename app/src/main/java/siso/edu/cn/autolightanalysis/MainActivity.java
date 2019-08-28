@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
     private Switch toggleAutoReadSpectrumBtn = null;
     private EditText toggleAutoReadSpectrumIntervalEdt = null;
     private LineChart spectrumLineChart = null;
+    private DataPreprocessingDialog dataPreprocessingDialog = new DataPreprocessingDialog();
 
     private UartDevice uartDevice = null;
     private PeripheralManager manager = PeripheralManager.getInstance();
@@ -79,8 +80,6 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
 
     // 串口数据
     private List<Byte> serialDataBuffer = new ArrayList<Byte>();
-    // 串口数据异步传输
-    private Handler serialHandler = new SerialHandler(this);
 
     // 自动读取频谱数据的定时器
     private Timer readTimer = null;
@@ -273,12 +272,14 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         readSpectrumBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                // 发送读取光谱的指令
-                new SerialAsyncTask(uartDevice).execute(Command.READ_SPECTRUM);
-
-                // 设置当前指令类型
-                currentCommand = Command.READ_SPECTRUM;
+                try {
+                    // 发送读取光谱的指令
+                    uartDevice.write(Command.READ_SPECTRUM.getBytes(), Command.READ_SPECTRUM.getBytes().length);
+                    // 设置当前指令类型
+                    currentCommand = Command.READ_SPECTRUM;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -324,15 +325,10 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
 
             if (Command.READ_SPECTRUM.equals(currentCommand)) {
                 if (serialDataBuffer.size() >= Command.MAX_SPECTRUM_DATA_LENGTH) {
-                    // 构建消息数据
-                    Bundle data = new Bundle();
-                    data.putByteArray(SerialHandler.DATA, Bytes.toArray(serialDataBuffer));
-                    Message dataMsg = new Message();
-                    dataMsg.what = SerialHandler.READ_SPECTRUM;
-                    dataMsg.setData(data);
-
-                    // 发送消息
-                    serialHandler.sendMessage(dataMsg);
+                    // 启动数据处理线程，优化性能
+                    new SerialAsyncTask(this).execute(serialDataBuffer.toArray(new Byte[]{}));
+                    // 显示经度对话框
+                    dataPreprocessingDialog.show(getSupportFragmentManager(), MainActivity.class.getName());
                 }
             }
         }
@@ -356,6 +352,14 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
 
     public LineChart getSpectrumLineChart() {
         return spectrumLineChart;
+    }
+
+    public DataPreprocessingDialog getDataPreprocessingDialog() {
+        return dataPreprocessingDialog;
+    }
+
+    public List<Byte> getSerialDataBuffer() {
+        return serialDataBuffer;
     }
 
     // 启动自动读取定时器

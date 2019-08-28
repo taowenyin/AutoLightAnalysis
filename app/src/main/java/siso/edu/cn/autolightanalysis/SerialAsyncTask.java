@@ -1,29 +1,67 @@
 package siso.edu.cn.autolightanalysis;
 
 import android.os.AsyncTask;
+import android.os.Message;
 
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.google.android.things.pio.UartDevice;
+import com.google.common.primitives.Bytes;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 
-public class SerialAsyncTask extends AsyncTask<String, Void, Void> {
+public class SerialAsyncTask extends AsyncTask<Byte, Void, Void> {
 
-    private UartDevice uartDevice = null;
+    private MainActivity activity = null;
 
-    public SerialAsyncTask(UartDevice uartDevice) {
-        this.uartDevice = uartDevice;
+    public SerialAsyncTask(MainActivity activity) {
+        this.activity = activity;
     }
 
     @Override
-    protected Void doInBackground(String... strings) {
+    protected Void doInBackground(Byte... bytes) {
 
-        // 发送读取光谱的指令
-        try {
-            uartDevice.write(strings[0].getBytes(), strings[0].getBytes().length);
-        } catch (IOException e) {
-            e.printStackTrace();
+        byte[] spectrumData = ArrayUtils.toPrimitive(bytes);
+
+        // 清空数据
+        activity.getNormalSpectrumData().clear();
+
+        // 填充数据集
+        for (int i = 0; i < spectrumData.length; i += 4) {
+            byte byte0 = spectrumData[i];
+            byte byte1 = spectrumData[i + 1];
+            byte byte2 = spectrumData[i + 2];
+            byte byte3 = spectrumData[i + 3];
+
+            int data = ((byte3 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte1 & 0xFF) << 8) | ((byte0 & 0xFF));
+
+            activity.getNormalSpectrumData().add(new Entry(i, data));
         }
 
+        // 设置图表数据
+        LineDataSet lightDataSet = (LineDataSet) activity.getSpectrumLineChart().getData().getDataSetByIndex(2);
+        lightDataSet.setValues(activity.getNormalSpectrumData());
+
         return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        // 显示数据
+        activity.getSpectrumLineChart().getData().notifyDataChanged();
+        activity.getSpectrumLineChart().notifyDataSetChanged();
+        activity.getSpectrumLineChart().invalidate();
+
+        // 处理完成后清空串口数据
+        activity.getSerialDataBuffer().clear();
+
+        // 关闭进度对话框
+        if (activity.getDataPreprocessingDialog() != null &&
+                activity.getDataPreprocessingDialog().getDialog() != null &&
+                activity.getDataPreprocessingDialog().getDialog().isShowing()) {
+            activity.getDataPreprocessingDialog().dismiss();
+        }
     }
 }

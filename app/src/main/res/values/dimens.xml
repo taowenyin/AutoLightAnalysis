@@ -7,4 +7,6 @@
     <dimen name="activity_font_size">8sp</dimen>
     <!--线性图表的标题-->
     <dimen name="line_chart_description_font_size">8sp</dimen>
+    <!--预处理GIF-->
+    <dimen name="preprocessing_gif_size">32dp</dimen>
 </resources>
