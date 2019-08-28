@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -247,7 +248,6 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
                         toggleAutoReadSpectrumBtn.setChecked(false);
                         toggleAutoReadSpectrumBtn.setEnabled(false);
                         readSpectrumBtn.setEnabled(false);
-                        toggleAutoReadSpectrumIntervalEdt.setEnabled(false);
                     } catch (IOException e) {
                         Log.w(TAG, "Unable to close UART device", e);
                     }
@@ -287,14 +287,21 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    readSpectrumBtn.setEnabled(false);
-                    toggleAutoReadSpectrumIntervalEdt.setEnabled(true);
+                    if (toggleAutoReadSpectrumIntervalEdt.getText().toString().equals(StringUtils.EMPTY) ||
+                            Integer.valueOf(toggleAutoReadSpectrumIntervalEdt.getText().toString()) >= 5) {
+                        readSpectrumBtn.setEnabled(false);
 
-                    // 开始自动读取
-                    startReadTimer();
+                        // 开始自动读取
+                        startReadTimer();
+                    } else {
+                        Toast.makeText(MainActivity.this,
+                                getResources().getString(R.string.auto_read_spectrum_warning_label),
+                                Toast.LENGTH_LONG).show();
+                        toggleAutoReadSpectrumBtn.setChecked(false);
+                    }
+
                 } else {
                     readSpectrumBtn.setEnabled(true);
-                    toggleAutoReadSpectrumIntervalEdt.setEnabled(false);
 
                     // 停止自动读取
                     stopReadTimer();
@@ -327,8 +334,10 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
                 if (serialDataBuffer.size() >= Command.MAX_SPECTRUM_DATA_LENGTH) {
                     // 启动数据处理线程，优化性能
                     new SerialAsyncTask(this).execute(serialDataBuffer.toArray(new Byte[]{}));
-                    // 显示经度对话框
-                    dataPreprocessingDialog.show(getSupportFragmentManager(), MainActivity.class.getName());
+                    if (!toggleAutoReadSpectrumBtn.isChecked()) {
+                        // 显示经度对话框
+                        dataPreprocessingDialog.show(getSupportFragmentManager(), MainActivity.class.getName());
+                    }
                 }
             }
         }
@@ -385,9 +394,11 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         }
 
         if (readTimer != null && readTimerTask != null) {
-            readTimer.schedule(readTimerTask, 0, Integer.valueOf(
-                    toggleAutoReadSpectrumIntervalEdt.getText().toString().equals(StringUtils.EMPTY) ?
-                            "10000" : toggleAutoReadSpectrumIntervalEdt.getText().toString()));
+            readTimer.schedule(readTimerTask,
+                    0,
+                    Integer.valueOf(
+                            toggleAutoReadSpectrumIntervalEdt.getText().toString().equals(StringUtils.EMPTY) ?
+                            "5" : toggleAutoReadSpectrumIntervalEdt.getText().toString()) * 1000);
         }
     }
 

@@ -2,6 +2,7 @@ package siso.edu.cn.autolightanalysis;
 
 import android.os.AsyncTask;
 import android.os.Message;
+import android.util.Log;
 
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -15,6 +16,8 @@ import java.io.IOException;
 public class SerialAsyncTask extends AsyncTask<Byte, Void, Void> {
 
     private MainActivity activity = null;
+
+    public static final String TAG = "===SerialAsyncTask===";
 
     public SerialAsyncTask(MainActivity activity) {
         this.activity = activity;
@@ -62,6 +65,10 @@ public class SerialAsyncTask extends AsyncTask<Byte, Void, Void> {
                 activity.getDataPreprocessingDialog().getDialog() != null &&
                 activity.getDataPreprocessingDialog().getDialog().isShowing()) {
             activity.getDataPreprocessingDialog().dismiss();
+
+            Log.i(TAG, "Close Dialog....");
         }
+
+        Log.i(TAG, "Update Line Chart....");
     }
 }

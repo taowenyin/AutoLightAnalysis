@@ -9,6 +9,8 @@
     <string name="read_spectrum_label">读取光谱</string>
     <string name="auto_read_spectrum_label">自动读取光谱</string>
     <string name="auto_read_spectrum_hint_label">自动读取频率</string>
+    <string name="auto_read_spectrum_unit_label">秒</string>
+    <string name="auto_read_spectrum_warning_label">必须大于5秒</string>
 
     <string name="light_spectrum_legend">白光谱</string>
     <string name="dark_spectrum_legend">暗光谱</string>

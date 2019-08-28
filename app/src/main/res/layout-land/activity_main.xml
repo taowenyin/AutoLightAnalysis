@@ -84,9 +84,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:enabled="false"
                 android:hint="@string/auto_read_spectrum_hint_label"
                 android:autofillHints="@string/auto_read_spectrum_hint_label"
+                android:gravity="center"
+                android:textSize="@dimen/activity_font_size"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/auto_read_spectrum_unit_label"
                 android:textSize="@dimen/activity_font_size"/>
 
         </LinearLayout>
