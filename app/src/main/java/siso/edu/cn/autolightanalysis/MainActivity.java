@@ -291,6 +291,10 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
                             Integer.valueOf(toggleAutoReadSpectrumIntervalEdt.getText().toString()) >= 5) {
                         readSpectrumBtn.setEnabled(false);
 
+                        // 开启自动就禁用保存
+                        saveLightSpectrumBtn.setEnabled(false);
+                        saveDarkSpectrumBtn.setEnabled(false);
+
                         // 开始自动读取
                         startReadTimer();
                     } else {
@@ -302,6 +306,10 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
 
                 } else {
                     readSpectrumBtn.setEnabled(true);
+
+                    // 关闭自动就开启保存
+                    saveLightSpectrumBtn.setEnabled(true);
+                    saveDarkSpectrumBtn.setEnabled(true);
 
                     // 停止自动读取
                     stopReadTimer();
