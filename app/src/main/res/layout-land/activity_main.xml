@@ -9,12 +9,10 @@
     android:orientation="horizontal"
     tools:context=".MainActivity">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:paddingRight="@dimen/activity_padding">
+        android:layout_height="match_parent"
+        android:layout_weight="1">
 
         <ToggleButton
             android:id="@+id/connect_device_btn"
@@ -22,15 +20,46 @@
             android:layout_height="wrap_content"
             android:checked="false"
             android:textOn="@string/connect_serial_toggle_on_label"
-            android:textOff="@string/connect_serial_toggle_off_label"/>
+            android:textOff="@string/connect_serial_toggle_off_label"
+            android:textSize="@dimen/activity_font_size"/>
 
         <ListView
             android:id="@+id/spectrum_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/connect_device_btn"
             android:entries="@array/spectrum_list_value"/>
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/spectrum_list_operate_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageButton
+                android:id="@+id/spectrum_item_undo"
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_undo_36dp"
+                android:scaleType="fitCenter"/>
+
+            <ImageButton
+                android:id="@+id/spectrum_item_delete"
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_delete_36dp"
+                android:scaleType="fitCenter"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="0dp"

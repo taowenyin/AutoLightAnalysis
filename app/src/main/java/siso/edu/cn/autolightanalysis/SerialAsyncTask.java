@@ -57,9 +57,6 @@ public class SerialAsyncTask extends AsyncTask<Byte, Void, Void> {
         activity.getSpectrumLineChart().notifyDataSetChanged();
         activity.getSpectrumLineChart().invalidate();
 
-        // 处理完成后清空串口数据
-        activity.getSerialDataBuffer().clear();
-
         // 关闭进度对话框
         if (activity.getDataPreprocessingDialog() != null &&
                 activity.getDataPreprocessingDialog().getDialog() != null &&

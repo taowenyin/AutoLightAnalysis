@@ -5,10 +5,12 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -26,11 +28,14 @@ import com.google.android.things.pio.UartDevice;
 import com.google.android.things.pio.UartDeviceCallback;
 import com.google.common.primitives.Bytes;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -66,9 +71,11 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
     private EditText toggleAutoReadSpectrumIntervalEdt = null;
     private LineChart spectrumLineChart = null;
     private DataPreprocessingDialog dataPreprocessingDialog = new DataPreprocessingDialog();
+    private ListView spectrumList = null;
 
     private UartDevice uartDevice = null;
     private PeripheralManager manager = PeripheralManager.getInstance();
+    private SpectrumListAdapter spectrumListAdapter = null;
 
     // 创建白光谱数据集和数据线
     private List<Entry> lightSpectrumData = new ArrayList<Entry>();
@@ -78,9 +85,13 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
     private List<Entry> normalSpectrumData = new ArrayList<Entry>();
     // 折线图数据集
     private List<ILineDataSet> spectrumDataSets = new ArrayList<ILineDataSet>();
+    // 用来存放CheckBox的选中状态
+    private SparseBooleanArray stateCheckedMap = new SparseBooleanArray();
 
+    // 串口缓存数据
+    private ArrayList<Byte> serialDataBuffer = new ArrayList<Byte>();
     // 串口数据
-    private List<Byte> serialDataBuffer = new ArrayList<Byte>();
+    private Map<String, List<Byte>> serialData = new HashMap<String, List<Byte>>();
 
     // 自动读取频谱数据的定时器
     private Timer readTimer = null;
@@ -101,6 +112,10 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         toggleAutoReadSpectrumBtn = findViewById(R.id.toggle_auto_read_spectrum_btn);
         toggleAutoReadSpectrumIntervalEdt = findViewById(R.id.toggle_auto_read_spectrum_interval_edt);
         spectrumLineChart = findViewById(R.id.spectrum_line_chart);
+        spectrumList = findViewById(R.id.spectrum_list);
+
+        spectrumListAdapter = new SpectrumListAdapter(this, serialData, stateCheckedMap);
+        spectrumList.setAdapter(spectrumListAdapter);
 
         LineDataSet lightSpectrumSet = new LineDataSet(lightSpectrumData, getResources().getString(R.string.light_spectrum_legend));
         // 设置数据线的颜色
@@ -258,14 +273,32 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         saveLightSpectrumBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                try {
+                    ArrayList<Byte> data = Command.DeepCopy(serialDataBuffer);
+                    serialData.put(Command.LIGHT_DATA, data);
 
+                    // 通知数据更新，更设置Check状态
+                    stateCheckedMap.put(0, false);
+                    spectrumListAdapter.notifyDataSetChanged();
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
         saveDarkSpectrumBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                try {
+                    ArrayList<Byte> data = Command.DeepCopy(serialDataBuffer);
+                    serialData.put(Command.DARK_DATA, data);
 
+                    // 通知数据更新，更设置Check状态
+                    stateCheckedMap.put(1, false);
+                    spectrumListAdapter.notifyDataSetChanged();
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -273,6 +306,8 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
             @Override
             public void onClick(View v) {
                 try {
+                    // 读取串口数据时清空串口缓存数据
+                    serialDataBuffer.clear();
                     // 发送读取光谱的指令
                     uartDevice.write(Command.READ_SPECTRUM.getBytes(), Command.READ_SPECTRUM.getBytes().length);
                     // 设置当前指令类型
@@ -390,6 +425,8 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
                 @Override
                 public void run() {
                     try {
+                        // 读取串口数据时清空串口缓存数据
+                        serialDataBuffer.clear();
                         // 发送读取光谱的指令
                         uartDevice.write(Command.READ_SPECTRUM.getBytes(), Command.READ_INTERNAL_TEMPERATURE.getBytes().length);
                         // 设置当前指令类型
