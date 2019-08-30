@@ -5,13 +5,18 @@
     <dimen name="list_margin">5dp</dimen>
     <dimen name="activity_margin_padding_0">0dp</dimen>
     <!--默认字体大小-->
-    <dimen name="activity_font_size">8sp</dimen>
+    <dimen name="activity_font_size">12sp</dimen>
     <!--线性图表的标题-->
     <dimen name="line_chart_description_font_size">8sp</dimen>
     <!--预处理GIF-->
     <dimen name="preprocessing_gif_size">32dp</dimen>
     <!--光谱列表的文字左边距-->
-    <dimen name="spectrum_item_text_margin_left">15dp</dimen>
-    <!--光谱列表的Checkbox右边距-->
-    <dimen name="spectrum_item_checkbox_margin_right">20dp</dimen>
+    <dimen name="spectrum_item_text_padding_left">4dp</dimen>
+    <!--光谱列表的图表大小-->
+    <dimen name="spectrum_item_icon_size">18dp</dimen>
+    <!--光谱列表的图表内边距-->
+    <dimen name="spectrum_item_h_padding">8dp</dimen>
+    <dimen name="spectrum_item_v_padding">2dp</dimen>
+    <!--光谱列表的分隔线高度-->
+    <dimen name="spectrum_item_divider_height">2dp</dimen>
 </resources>

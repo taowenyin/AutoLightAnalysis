@@ -7,9 +7,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -72,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
     private LineChart spectrumLineChart = null;
     private DataPreprocessingDialog dataPreprocessingDialog = new DataPreprocessingDialog();
     private ListView spectrumList = null;
+    private LinearLayout spectrumListOperateBar = null;
+    private ImageButton spectrumItemUndo = null;
+    private ImageButton spectrumItemDelete = null;
 
     private UartDevice uartDevice = null;
     private PeripheralManager manager = PeripheralManager.getInstance();
@@ -113,9 +119,14 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         toggleAutoReadSpectrumIntervalEdt = findViewById(R.id.toggle_auto_read_spectrum_interval_edt);
         spectrumLineChart = findViewById(R.id.spectrum_line_chart);
         spectrumList = findViewById(R.id.spectrum_list);
+        spectrumListOperateBar = findViewById(R.id.spectrum_list_operate_bar);
+        spectrumItemUndo = findViewById(R.id.spectrum_item_undo);
+        spectrumItemDelete = findViewById(R.id.spectrum_item_delete);
 
         spectrumListAdapter = new SpectrumListAdapter(this, serialData, stateCheckedMap);
         spectrumList.setAdapter(spectrumListAdapter);
+        // 设置ListView为多选项
+        spectrumList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         LineDataSet lightSpectrumSet = new LineDataSet(lightSpectrumData, getResources().getString(R.string.light_spectrum_legend));
         // 设置数据线的颜色
@@ -289,16 +300,24 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         saveDarkSpectrumBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    ArrayList<Byte> data = Command.DeepCopy(serialDataBuffer);
-                    serialData.put(Command.DARK_DATA, data);
+                // 判断白光谱是否已经保存
+                if (serialData.containsKey(Command.LIGHT_DATA)) {
+                    try {
+                        ArrayList<Byte> data = Command.DeepCopy(serialDataBuffer);
+                        serialData.put(Command.DARK_DATA, data);
 
-                    // 通知数据更新，更设置Check状态
-                    stateCheckedMap.put(1, false);
-                    spectrumListAdapter.notifyDataSetChanged();
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+                        // 通知数据更新，更设置Check状态
+                        stateCheckedMap.put(1, false);
+                        spectrumListAdapter.notifyDataSetChanged();
+                    } catch (IOException | ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this,
+                            getResources().getString(R.string.save_dark_condition),
+                            Toast.LENGTH_LONG).show();
                 }
+
             }
         });
 
@@ -348,6 +367,74 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
 
                     // 停止自动读取
                     stopReadTimer();
+                }
+            }
+        });
+
+        spectrumList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (spectrumListAdapter.isShowCheckBox()) {
+                    // 获取选中对象的组件
+                    SpectrumListAdapter.ViewHolder holder = (SpectrumListAdapter.ViewHolder) view.getTag();
+                    // 设置CheckBox的状态
+                    holder.spectrumItemSelect.toggle();
+                    stateCheckedMap.put(position, holder.spectrumItemSelect.isChecked());
+                    spectrumList.setItemChecked(position, holder.spectrumItemSelect.isChecked());
+                    spectrumListAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+
+        spectrumList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                // 显示操作菜单
+                spectrumListOperateBar.setVisibility(View.VISIBLE);
+                // 显示多选按钮
+                spectrumListAdapter.setShowCheckBox(true);
+
+                // 获取选中对象的组件
+                SpectrumListAdapter.ViewHolder holder = (SpectrumListAdapter.ViewHolder) view.getTag();
+                // 设置CheckBox的状态
+                holder.spectrumItemSelect.setChecked(stateCheckedMap.get(position));
+                spectrumList.setItemChecked(position, holder.spectrumItemSelect.isChecked());
+                spectrumListAdapter.notifyDataSetChanged();
+
+                return true;
+            }
+        });
+
+        spectrumItemUndo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 全部设置为False
+                for (int i = 0; i < stateCheckedMap.size(); i++) {
+                    stateCheckedMap.put(i, false);
+                }
+                // 隐藏多选按钮
+                spectrumListAdapter.setShowCheckBox(false);
+                spectrumListAdapter.notifyDataSetChanged();
+                // 隐藏操作菜单
+                spectrumListOperateBar.setVisibility(View.GONE);
+            }
+        });
+
+        spectrumItemDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for (int i = 0; i < stateCheckedMap.size(); i++) {
+                    if (stateCheckedMap.get(i)) {
+                        if (i == 0 && stateCheckedMap.get(1)) {
+                            serialData.remove(Command.LIGHT_DATA);
+                        } else if (i == 1) {
+                            serialData.remove(Command.DARK_DATA);
+                        } else {
+                            if (serialData.containsKey(String.format(Command.NORMAL_DATA, i))) {
+                                serialData.remove(String.format(Command.NORMAL_DATA, i));
+                            }
+                        }
+                    }
                 }
             }
         });

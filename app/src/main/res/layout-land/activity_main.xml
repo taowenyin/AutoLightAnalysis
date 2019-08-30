@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingRight="@dimen/activity_padding"
-    android:paddingLeft="@dimen/activity_padding"
+    android:paddingEnd="@dimen/activity_padding"
     android:orientation="horizontal"
     tools:context=".MainActivity">
 
@@ -18,6 +17,7 @@
             android:id="@+id/connect_device_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_padding"
             android:checked="false"
             android:textOn="@string/connect_serial_toggle_on_label"
             android:textOff="@string/connect_serial_toggle_off_label"
@@ -28,7 +28,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/connect_device_btn"
-            android:entries="@array/spectrum_list_value"/>
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="@dimen/spectrum_item_divider_height"/>
 
         <LinearLayout
             android:id="@+id/spectrum_list_operate_bar"

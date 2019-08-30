@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -55,27 +56,26 @@ public class SpectrumListAdapter extends BaseAdapter {
 
         holder.spectrumItemSelect = convertView.findViewById(R.id.spectrum_item_select);
         holder.spectrumItemName = convertView.findViewById(R.id.spectrum_item_name);
-        showAndHideCheckBox();
+        holder.spectrumItemIcon = convertView.findViewById(R.id.spectrum_item_icon);
 
-        holder.spectrumItemSelect.setChecked(stateCheckedMap.get(position));
-        if (position == 0) {
-            holder.spectrumItemName.setText(Command.LIGHT_DATA);
-        } else if (position == 1) {
-            holder.spectrumItemName.setText(Command.DARK_DATA);
-        } else {
-            holder.spectrumItemName.setText(String.format(Command.NORMAL_DATA, position));
-        }
-
-        return convertView;
-    }
-
-    // 控制CheckBox是否显示
-    private void showAndHideCheckBox() {
         if (isShowCheckBox) {
             holder.spectrumItemSelect.setVisibility(View.VISIBLE);
         } else {
             holder.spectrumItemSelect.setVisibility(View.GONE);
         }
+        holder.spectrumItemSelect.setChecked(stateCheckedMap.get(position));
+        if (position == 0) {
+            holder.spectrumItemIcon.setImageResource(R.drawable.ic_light_36dp);
+            holder.spectrumItemName.setText(Command.LIGHT_DATA);
+        } else if (position == 1) {
+            holder.spectrumItemIcon.setImageResource(R.drawable.ic_dark_36dp);
+            holder.spectrumItemName.setText(Command.DARK_DATA);
+        } else {
+            holder.spectrumItemIcon.setImageResource(R.drawable.ic_normal_36dp);
+            holder.spectrumItemName.setText(String.format(Command.NORMAL_DATA, position));
+        }
+
+        return convertView;
     }
 
     public boolean isShowCheckBox() {
@@ -86,8 +86,9 @@ public class SpectrumListAdapter extends BaseAdapter {
         this.isShowCheckBox = showCheckBox;
     }
 
-    private class ViewHolder {
+    public class ViewHolder {
         public TextView spectrumItemName;
         public CheckBox spectrumItemSelect;
+        public ImageView spectrumItemIcon;
     }
 }

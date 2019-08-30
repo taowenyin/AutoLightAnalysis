@@ -21,7 +21,7 @@ public class Command {
 
     public static final String DARK_DATA = "Dark";
 
-    public static final String NORMAL_DATA = "Normal-%d";
+    public static final String NORMAL_DATA = "Nor-%d";
 
     // 通过序列化和反序列化实现List的深度拷贝
     public static ArrayList<Byte> DeepCopy(ArrayList<Byte> src) throws IOException, ClassNotFoundException {

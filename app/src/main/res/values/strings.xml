@@ -11,22 +11,11 @@
     <string name="auto_read_spectrum_hint_label">自动读取频率</string>
     <string name="auto_read_spectrum_unit_label">秒</string>
     <string name="auto_read_spectrum_warning_label">必须大于5秒</string>
+    <string name="save_dark_condition">必须先保存白光谱</string>
 
     <string name="light_spectrum_legend">白光谱</string>
     <string name="dark_spectrum_legend">暗光谱</string>
     <string name="line_chart_no_data">暂无数据</string>
     <string name="line_chart_description">无损检测光谱</string>
 
-    <string-array name="serial_port_list_value">
-        <item>COM1</item>
-        <item>COM2</item>
-        <item>COM3</item>
-        <item>COM4</item>
-    </string-array>
-
-    <string-array name="spectrum_list_value">
-        <item>光谱1</item>
-        <item>光谱2</item>
-        <item>光谱3</item>
-    </string-array>
 </resources>
