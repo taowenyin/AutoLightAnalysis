@@ -23,6 +23,12 @@ public class Command {
 
     public static final String NORMAL_DATA = "Nor-%d";
 
+    public static final String NORMAL_TMP_DATA = "Normal";
+
+    public static final String SPECTRUM_ITEM_NAME_KEY = "Name";
+    public static final String SPECTRUM_ITEM_DATA_KEY = "Data";
+    public static final String SPECTRUM_ITEM_STATUS_KEY = "Status";
+
     // 通过序列化和反序列化实现List的深度拷贝
     public static ArrayList<Byte> DeepCopy(ArrayList<Byte> src) throws IOException, ClassNotFoundException {
 

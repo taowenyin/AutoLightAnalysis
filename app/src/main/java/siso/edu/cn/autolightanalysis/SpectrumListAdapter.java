@@ -1,7 +1,6 @@
 package siso.edu.cn.autolightanalysis;
 
 import android.content.Context;
-import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -9,24 +8,22 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class SpectrumListAdapter extends BaseAdapter {
 
-    private Map<String, List<Byte>> serialData = null;
+    private ArrayList<Map<String, Object>> serialData = null;
+
     private ViewHolder holder = null;
     // 当前是否处于多选状态
     private boolean isShowCheckBox = false;
-    // 存放CheckBox状态值
-    private SparseBooleanArray stateCheckedMap = new SparseBooleanArray();
 
     private Context context = null;
 
-    public SpectrumListAdapter(Context context, Map<String, List<Byte>> serialData, SparseBooleanArray stateCheckedMap) {
+    public SpectrumListAdapter(Context context, ArrayList<Map<String, Object>> serialData) {
         this.context = context;
         this.serialData = serialData;
-        this.stateCheckedMap = stateCheckedMap;
     }
 
     @Override
@@ -36,7 +33,7 @@ public class SpectrumListAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return null;
+        return serialData.get(position);
     }
 
     @Override
@@ -63,17 +60,18 @@ public class SpectrumListAdapter extends BaseAdapter {
         } else {
             holder.spectrumItemSelect.setVisibility(View.GONE);
         }
-        holder.spectrumItemSelect.setChecked(stateCheckedMap.get(position));
-        if (position == 0) {
+        holder.spectrumItemSelect.setChecked((Boolean) serialData.get(position).get(Command.SPECTRUM_ITEM_STATUS_KEY));
+
+        // 获取数据项的内容
+        String itemName = (String) serialData.get(position).get(Command.SPECTRUM_ITEM_NAME_KEY);
+        if (itemName.equals(Command.LIGHT_DATA)) {
             holder.spectrumItemIcon.setImageResource(R.drawable.ic_light_36dp);
-            holder.spectrumItemName.setText(Command.LIGHT_DATA);
-        } else if (position == 1) {
+        } else if (itemName.equals(Command.DARK_DATA)) {
             holder.spectrumItemIcon.setImageResource(R.drawable.ic_dark_36dp);
-            holder.spectrumItemName.setText(Command.DARK_DATA);
         } else {
             holder.spectrumItemIcon.setImageResource(R.drawable.ic_normal_36dp);
-            holder.spectrumItemName.setText(String.format(Command.NORMAL_DATA, position));
         }
+        holder.spectrumItemName.setText(itemName);
 
         return convertView;
     }

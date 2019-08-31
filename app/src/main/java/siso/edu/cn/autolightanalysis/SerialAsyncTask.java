@@ -44,7 +44,7 @@ public class SerialAsyncTask extends AsyncTask<Byte, Void, Void> {
         }
 
         // 设置图表数据
-        LineDataSet lightDataSet = (LineDataSet) activity.getSpectrumLineChart().getData().getDataSetByIndex(2);
+        LineDataSet lightDataSet = (LineDataSet) activity.getSpectrumLineChart().getData().getDataSetByIndex(0);
         lightDataSet.setValues(activity.getNormalSpectrumData());
 
         return null;

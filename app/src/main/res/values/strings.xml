@@ -13,8 +13,6 @@
     <string name="auto_read_spectrum_warning_label">必须大于5秒</string>
     <string name="save_dark_condition">必须先保存白光谱</string>
 
-    <string name="light_spectrum_legend">白光谱</string>
-    <string name="dark_spectrum_legend">暗光谱</string>
     <string name="line_chart_no_data">暂无数据</string>
     <string name="line_chart_description">无损检测光谱</string>
 

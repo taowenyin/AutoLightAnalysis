@@ -83,21 +83,15 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
     private PeripheralManager manager = PeripheralManager.getInstance();
     private SpectrumListAdapter spectrumListAdapter = null;
 
-    // 创建白光谱数据集和数据线
-    private List<Entry> lightSpectrumData = new ArrayList<Entry>();
-    // 创建暗光谱数据集和数据线
-    private List<Entry> darkSpectrumData = new ArrayList<Entry>();
     // 创建普通光谱数据集和数据线
     private List<Entry> normalSpectrumData = new ArrayList<Entry>();
     // 折线图数据集
     private List<ILineDataSet> spectrumDataSets = new ArrayList<ILineDataSet>();
-    // 用来存放CheckBox的选中状态
-    private SparseBooleanArray stateCheckedMap = new SparseBooleanArray();
 
     // 串口缓存数据
     private ArrayList<Byte> serialDataBuffer = new ArrayList<Byte>();
     // 串口数据
-    private Map<String, List<Byte>> serialData = new HashMap<String, List<Byte>>();
+    private ArrayList<Map<String, Object>> serialData = new ArrayList<Map<String, Object>>();
 
     // 自动读取频谱数据的定时器
     private Timer readTimer = null;
@@ -123,81 +117,35 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         spectrumItemUndo = findViewById(R.id.spectrum_item_undo);
         spectrumItemDelete = findViewById(R.id.spectrum_item_delete);
 
-        spectrumListAdapter = new SpectrumListAdapter(this, serialData, stateCheckedMap);
+        spectrumListAdapter = new SpectrumListAdapter(this, serialData);
         spectrumList.setAdapter(spectrumListAdapter);
         // 设置ListView为多选项
         spectrumList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-        LineDataSet lightSpectrumSet = new LineDataSet(lightSpectrumData, getResources().getString(R.string.light_spectrum_legend));
+        LineDataSet normalSpectrumSet = new LineDataSet(normalSpectrumData, Command.NORMAL_TMP_DATA);
         // 设置数据线的颜色
-        lightSpectrumSet.setColor(getResources().getColor(R.color.colorLight, getTheme()));
+        normalSpectrumSet.setColor(getResources().getColor(R.color.colorBlue, getTheme()));
         // 设置数据线的线宽
-        lightSpectrumSet.setLineWidth(2f);
+        normalSpectrumSet.setLineWidth(2f);
         // 设置数据点的颜色
-        lightSpectrumSet.setCircleColor(getResources().getColor(R.color.colorLight, getTheme()));
+        normalSpectrumSet.setCircleColor(getResources().getColor(R.color.colorBlue, getTheme()));
         // 设置数据点的半径
-        lightSpectrumSet.setCircleRadius(4f);
+        normalSpectrumSet.setCircleRadius(4f);
         // 不绘制空心圆
-        lightSpectrumSet.setDrawCircleHole(false);
+        normalSpectrumSet.setDrawCircleHole(false);
         // 设置数据点的文字大小
-        lightSpectrumSet.setValueTextSize(10f);
+        normalSpectrumSet.setValueTextSize(10f);
         // 不对折线图进行填充
-        lightSpectrumSet.setDrawFilled(false);
+        normalSpectrumSet.setDrawFilled(false);
         // 图例的高度
-        lightSpectrumSet.setFormLineWidth(3f);
+        normalSpectrumSet.setFormLineWidth(3f);
         // 图例的宽度
-        lightSpectrumSet.setFormSize(8f);
+        normalSpectrumSet.setFormSize(8f);
         // 设置折线图为弧线
-        lightSpectrumSet.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
-
-        LineDataSet darkSpectrumSet = new LineDataSet(darkSpectrumData, getResources().getString(R.string.dark_spectrum_legend));
-        // 设置数据线的颜色
-        darkSpectrumSet.setColor(getResources().getColor(R.color.colorDark, getTheme()));
-        // 设置数据线的线宽
-        darkSpectrumSet.setLineWidth(2f);
-        // 设置数据点的颜色
-        darkSpectrumSet.setCircleColor(getResources().getColor(R.color.colorDark, getTheme()));
-        // 设置数据点的半径
-        darkSpectrumSet.setCircleRadius(4f);
-        // 不绘制空心圆
-        darkSpectrumSet.setDrawCircleHole(false);
-        // 设置数据点的文字大小
-        darkSpectrumSet.setValueTextSize(10f);
-        // 不对折线图进行填充
-        darkSpectrumSet.setDrawFilled(false);
-        // 图例的高度
-        darkSpectrumSet.setFormLineWidth(3f);
-        // 图例的宽度
-        darkSpectrumSet.setFormSize(8f);
-        // 设置折线图为弧线
-        darkSpectrumSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-
-        LineDataSet normalSpectrumData = new LineDataSet(darkSpectrumData, getResources().getString(R.string.dark_spectrum_legend));
-        // 设置数据线的颜色
-        normalSpectrumData.setColor(getResources().getColor(R.color.colorBlue, getTheme()));
-        // 设置数据线的线宽
-        normalSpectrumData.setLineWidth(2f);
-        // 设置数据点的颜色
-        normalSpectrumData.setCircleColor(getResources().getColor(R.color.colorBlue, getTheme()));
-        // 设置数据点的半径
-        normalSpectrumData.setCircleRadius(4f);
-        // 不绘制空心圆
-        normalSpectrumData.setDrawCircleHole(false);
-        // 设置数据点的文字大小
-        normalSpectrumData.setValueTextSize(10f);
-        // 不对折线图进行填充
-        normalSpectrumData.setDrawFilled(false);
-        // 图例的高度
-        normalSpectrumData.setFormLineWidth(3f);
-        // 图例的宽度
-        normalSpectrumData.setFormSize(8f);
-        // 设置折线图为弧线
-        normalSpectrumData.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        normalSpectrumSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
 
         // 添加数据线
-        spectrumDataSets.add(lightSpectrumSet);
-        spectrumDataSets.add(darkSpectrumSet);
-        spectrumDataSets.add(normalSpectrumData);
+        spectrumDataSets.add(normalSpectrumSet);
         // 折线图数据集
         LineData spectrumLineData = new LineData(spectrumDataSets);
         // 折线图显示数据
@@ -286,10 +234,28 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
             public void onClick(View v) {
                 try {
                     ArrayList<Byte> data = Command.DeepCopy(serialDataBuffer);
-                    serialData.put(Command.LIGHT_DATA, data);
 
-                    // 通知数据更新，更设置Check状态
-                    stateCheckedMap.put(0, false);
+                    // 如果列表中已经有数据，那么就更新数据
+                    for (int i = 0; i < serialData.size(); i++) {
+                        if (serialData.get(i).get(Command.SPECTRUM_ITEM_NAME_KEY).equals(Command.LIGHT_DATA)) {
+                            serialData.get(i).put(Command.SPECTRUM_ITEM_DATA_KEY, data);
+
+                            // 通知数据更新
+                            spectrumListAdapter.notifyDataSetChanged();
+
+                            return;
+                        }
+                    }
+
+                    // 如果没有数据，那么就创建数据
+                    Map<String, Object> itemData = new HashMap<String, Object>();
+                    itemData.put(Command.SPECTRUM_ITEM_NAME_KEY, Command.LIGHT_DATA);
+                    itemData.put(Command.SPECTRUM_ITEM_DATA_KEY, data);
+                    itemData.put(Command.SPECTRUM_ITEM_STATUS_KEY, false);
+
+                    serialData.add(itemData);
+
+                    // 通知数据更新
                     spectrumListAdapter.notifyDataSetChanged();
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
@@ -300,24 +266,34 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         saveDarkSpectrumBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 判断白光谱是否已经保存
-                if (serialData.containsKey(Command.LIGHT_DATA)) {
-                    try {
-                        ArrayList<Byte> data = Command.DeepCopy(serialDataBuffer);
-                        serialData.put(Command.DARK_DATA, data);
+                try {
+                    ArrayList<Byte> data = Command.DeepCopy(serialDataBuffer);
 
-                        // 通知数据更新，更设置Check状态
-                        stateCheckedMap.put(1, false);
-                        spectrumListAdapter.notifyDataSetChanged();
-                    } catch (IOException | ClassNotFoundException e) {
-                        e.printStackTrace();
+                    // 如果列表中已经有数据，那么就更新数据
+                    for (int i = 0; i < serialData.size(); i++) {
+                        if (serialData.get(i).get(Command.SPECTRUM_ITEM_NAME_KEY).equals(Command.DARK_DATA)) {
+                            serialData.get(i).put(Command.SPECTRUM_ITEM_DATA_KEY, data);
+
+                            // 通知数据更新
+                            spectrumListAdapter.notifyDataSetChanged();
+
+                            return;
+                        }
                     }
-                } else {
-                    Toast.makeText(MainActivity.this,
-                            getResources().getString(R.string.save_dark_condition),
-                            Toast.LENGTH_LONG).show();
-                }
 
+                    // 如果没有数据，那么就创建数据
+                    Map<String, Object> itemData = new HashMap<String, Object>();
+                    itemData.put(Command.SPECTRUM_ITEM_NAME_KEY, Command.DARK_DATA);
+                    itemData.put(Command.SPECTRUM_ITEM_DATA_KEY, data);
+                    itemData.put(Command.SPECTRUM_ITEM_STATUS_KEY, false);
+
+                    serialData.add(itemData);
+
+                    // 通知数据更新
+                    spectrumListAdapter.notifyDataSetChanged();
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -379,7 +355,8 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
                     SpectrumListAdapter.ViewHolder holder = (SpectrumListAdapter.ViewHolder) view.getTag();
                     // 设置CheckBox的状态
                     holder.spectrumItemSelect.toggle();
-                    stateCheckedMap.put(position, holder.spectrumItemSelect.isChecked());
+
+                    serialData.get(position).put(Command.SPECTRUM_ITEM_STATUS_KEY, holder.spectrumItemSelect.isChecked());
                     spectrumList.setItemChecked(position, holder.spectrumItemSelect.isChecked());
                     spectrumListAdapter.notifyDataSetChanged();
                 }
@@ -397,7 +374,7 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
                 // 获取选中对象的组件
                 SpectrumListAdapter.ViewHolder holder = (SpectrumListAdapter.ViewHolder) view.getTag();
                 // 设置CheckBox的状态
-                holder.spectrumItemSelect.setChecked(stateCheckedMap.get(position));
+                holder.spectrumItemSelect.setChecked((Boolean) serialData.get(position).get(Command.SPECTRUM_ITEM_STATUS_KEY));
                 spectrumList.setItemChecked(position, holder.spectrumItemSelect.isChecked());
                 spectrumListAdapter.notifyDataSetChanged();
 
@@ -409,33 +386,35 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
             @Override
             public void onClick(View v) {
                 // 全部设置为False
-                for (int i = 0; i < stateCheckedMap.size(); i++) {
-                    stateCheckedMap.put(i, false);
+                for (int i = 0; i < serialData.size(); i++) {
+                    serialData.get(i).put(Command.SPECTRUM_ITEM_STATUS_KEY, false);
                 }
                 // 隐藏多选按钮
                 spectrumListAdapter.setShowCheckBox(false);
-                spectrumListAdapter.notifyDataSetChanged();
                 // 隐藏操作菜单
                 spectrumListOperateBar.setVisibility(View.GONE);
+
+                spectrumListAdapter.notifyDataSetChanged();
             }
         });
 
         spectrumItemDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for (int i = 0; i < stateCheckedMap.size(); i++) {
-                    if (stateCheckedMap.get(i)) {
-                        if (i == 0 && stateCheckedMap.get(1)) {
-                            serialData.remove(Command.LIGHT_DATA);
-                        } else if (i == 1) {
-                            serialData.remove(Command.DARK_DATA);
-                        } else {
-                            if (serialData.containsKey(String.format(Command.NORMAL_DATA, i))) {
-                                serialData.remove(String.format(Command.NORMAL_DATA, i));
-                            }
-                        }
+                for (int i = 0; i < serialData.size(); i++) {
+                    if (true == (Boolean) serialData.get(i).get(Command.SPECTRUM_ITEM_STATUS_KEY)) {
+                        // 删除数据
+                        serialData.remove(i);
+                        // 索引重新置位
+                        i = -1;
                     }
                 }
+                // 隐藏多选按钮
+                spectrumListAdapter.setShowCheckBox(false);
+                // 隐藏操作菜单
+                spectrumListOperateBar.setVisibility(View.GONE);
+
+                spectrumListAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -473,20 +452,8 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         }
     }
 
-    public List<Entry> getLightSpectrumData() {
-        return lightSpectrumData;
-    }
-
-    public List<Entry> getDarkSpectrumData() {
-        return darkSpectrumData;
-    }
-
     public List<Entry> getNormalSpectrumData() {
         return normalSpectrumData;
-    }
-
-    public List<ILineDataSet> getSpectrumDataSets() {
-        return spectrumDataSets;
     }
 
     public LineChart getSpectrumLineChart() {
@@ -495,10 +462,6 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
 
     public DataPreprocessingDialog getDataPreprocessingDialog() {
         return dataPreprocessingDialog;
-    }
-
-    public List<Byte> getSerialDataBuffer() {
-        return serialDataBuffer;
     }
 
     // 启动自动读取定时器
