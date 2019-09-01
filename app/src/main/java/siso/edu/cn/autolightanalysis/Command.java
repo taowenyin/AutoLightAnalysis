@@ -25,9 +25,14 @@ public class Command {
 
     public static final String NORMAL_TMP_DATA = "Normal";
 
+    // 数据线名称
     public static final String SPECTRUM_ITEM_NAME_KEY = "Name";
+    // 数据线数据
     public static final String SPECTRUM_ITEM_DATA_KEY = "Data";
+    // 数据线选中状态
     public static final String SPECTRUM_ITEM_STATUS_KEY = "Status";
+    // 数据线显示状态
+    public static final String SPECTRUM_ITEM_SHOW_KEY = "Show";
 
     // 通过序列化和反序列化实现List的深度拷贝
     public static ArrayList<Byte> DeepCopy(ArrayList<Byte> src) throws IOException, ClassNotFoundException {

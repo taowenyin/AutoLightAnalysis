@@ -84,9 +84,9 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
     private SpectrumListAdapter spectrumListAdapter = null;
 
     // 创建普通光谱数据集和数据线
-    private List<Entry> normalSpectrumData = new ArrayList<Entry>();
+    private ArrayList<Entry> normalSpectrumData = new ArrayList<Entry>();
     // 折线图数据集
-    private List<ILineDataSet> spectrumDataSets = new ArrayList<ILineDataSet>();
+    private ArrayList<ILineDataSet> spectrumDataSets = new ArrayList<ILineDataSet>();
 
     // 串口缓存数据
     private ArrayList<Byte> serialDataBuffer = new ArrayList<Byte>();
@@ -252,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
                     itemData.put(Command.SPECTRUM_ITEM_NAME_KEY, Command.LIGHT_DATA);
                     itemData.put(Command.SPECTRUM_ITEM_DATA_KEY, data);
                     itemData.put(Command.SPECTRUM_ITEM_STATUS_KEY, false);
+                    itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, false);
 
                     serialData.add(itemData);
 
@@ -286,6 +287,7 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
                     itemData.put(Command.SPECTRUM_ITEM_NAME_KEY, Command.DARK_DATA);
                     itemData.put(Command.SPECTRUM_ITEM_DATA_KEY, data);
                     itemData.put(Command.SPECTRUM_ITEM_STATUS_KEY, false);
+                    itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, false);
 
                     serialData.add(itemData);
 
@@ -359,6 +361,14 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
                     serialData.get(position).put(Command.SPECTRUM_ITEM_STATUS_KEY, holder.spectrumItemSelect.isChecked());
                     spectrumList.setItemChecked(position, holder.spectrumItemSelect.isChecked());
                     spectrumListAdapter.notifyDataSetChanged();
+                } else {
+                    Boolean isShow = (Boolean) serialData.get(position).get(Command.SPECTRUM_ITEM_SHOW_KEY);
+
+                    if (!isShow) {
+                        addNewSpectrumLine(serialData.get(position));
+                    } else {
+                        removeSpectrumLine(serialData.get(position));
+                    }
                 }
             }
         });
@@ -403,8 +413,15 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
             public void onClick(View v) {
                 for (int i = 0; i < serialData.size(); i++) {
                     if (true == (Boolean) serialData.get(i).get(Command.SPECTRUM_ITEM_STATUS_KEY)) {
+                        // 如果数据表显示则删除数据表显示
+                        Boolean isShow = (Boolean) serialData.get(i).get(Command.SPECTRUM_ITEM_SHOW_KEY);
+                        if (isShow) {
+                            removeSpectrumLine(serialData.get(i));
+                        }
+
                         // 删除数据
                         serialData.remove(i);
+
                         // 索引重新置位
                         i = -1;
                     }
@@ -508,6 +525,88 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
             readTimerTask.cancel();
             readTimerTask = null;
         }
+    }
+
+    private void addNewSpectrumLine(Map<String, Object> spectrumDataMap) {
+        // 获取数据集中的数据
+        ArrayList<Byte> spectrumDataList = (ArrayList<Byte>) spectrumDataMap.get(Command.SPECTRUM_ITEM_DATA_KEY);
+        ArrayList<Entry> newSpectrumLine = new ArrayList<Entry>();
+
+        byte[] spectrumData = ArrayUtils.toPrimitive(spectrumDataList.toArray(new Byte[]{}));
+
+        // 填充数据集
+        for (int i = 0; i < spectrumData.length; i += 4) {
+            byte byte0 = spectrumData[i];
+            byte byte1 = spectrumData[i + 1];
+            byte byte2 = spectrumData[i + 2];
+            byte byte3 = spectrumData[i + 3];
+
+            int data = ((byte3 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte1 & 0xFF) << 8) | ((byte0 & 0xFF));
+
+            newSpectrumLine.add(new Entry(i, data));
+        }
+
+        // 获取数据名称
+        String spectrumName = (String) spectrumDataMap.get(Command.SPECTRUM_ITEM_NAME_KEY);
+
+        LineDataSet newSpectrumSet = new LineDataSet(newSpectrumLine, spectrumName);
+
+        // 设置数据线和数据点的颜色
+        if (spectrumName.equals(Command.LIGHT_DATA)) {
+            newSpectrumSet.setColor(getResources().getColor(R.color.colorLight, getTheme()));
+            newSpectrumSet.setCircleColor(getResources().getColor(R.color.colorLight, getTheme()));
+        } else if (spectrumName.equals(Command.DARK_DATA)) {
+            newSpectrumSet.setColor(getResources().getColor(R.color.colorDark, getTheme()));
+            newSpectrumSet.setCircleColor(getResources().getColor(R.color.colorDark, getTheme()));
+        } else {
+            newSpectrumSet.setColor(getResources().getColor(R.color.colorBlue, getTheme()));
+            newSpectrumSet.setCircleColor(getResources().getColor(R.color.colorBlue, getTheme()));
+        }
+
+        // 设置数据线的线宽
+        newSpectrumSet.setLineWidth(2f);
+        // 设置数据点的半径
+        newSpectrumSet.setCircleRadius(4f);
+        // 不绘制空心圆
+        newSpectrumSet.setDrawCircleHole(false);
+        // 设置数据点的文字大小
+        newSpectrumSet.setValueTextSize(10f);
+        // 不对折线图进行填充
+        newSpectrumSet.setDrawFilled(false);
+        // 图例的高度
+        newSpectrumSet.setFormLineWidth(3f);
+        // 图例的宽度
+        newSpectrumSet.setFormSize(8f);
+        // 设置折线图为弧线
+        newSpectrumSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+
+        // 添加数据线
+        spectrumDataSets.add(newSpectrumSet);
+
+        // 显示数据
+        spectrumLineChart.getData().notifyDataChanged();
+        spectrumLineChart.notifyDataSetChanged();
+        spectrumLineChart.invalidate();
+
+        // 修改显示状态
+        spectrumDataMap.put(Command.SPECTRUM_ITEM_SHOW_KEY, true);
+    }
+
+    private void removeSpectrumLine(Map<String, Object> spectrumDataMap) {
+        // 获取数据名称
+        String spectrumName = (String) spectrumDataMap.get(Command.SPECTRUM_ITEM_NAME_KEY);
+        // 获取要删除的数据集
+        ILineDataSet dataSet = spectrumLineChart.getData().getDataSetByLabel(spectrumName, true);
+        // 删除数据集
+        spectrumLineChart.getData().removeDataSet(dataSet);
+
+        // 显示数据
+        spectrumLineChart.getData().notifyDataChanged();
+        spectrumLineChart.notifyDataSetChanged();
+        spectrumLineChart.invalidate();
+
+        // 修改显示状态
+        spectrumDataMap.put(Command.SPECTRUM_ITEM_SHOW_KEY, false);
     }
 
     @Override
