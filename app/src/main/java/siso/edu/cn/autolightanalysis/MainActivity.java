@@ -1,11 +1,8 @@
 package siso.edu.cn.autolightanalysis;
 
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -29,7 +26,6 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.google.android.things.pio.PeripheralManager;
 import com.google.android.things.pio.UartDevice;
 import com.google.android.things.pio.UartDeviceCallback;
-import com.google.common.primitives.Bytes;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -92,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
     private ArrayList<Byte> serialDataBuffer = new ArrayList<Byte>();
     // 串口数据
     private ArrayList<Map<String, Object>> serialData = new ArrayList<Map<String, Object>>();
+    // 已经有亮和暗数据
+    private boolean hasLightData = false, hasDarkData = false;
 
     // 自动读取频谱数据的定时器
     private Timer readTimer = null;
@@ -258,6 +256,9 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
 
                     // 通知数据更新
                     spectrumListAdapter.notifyDataSetChanged();
+
+                    // 保存了亮数据
+                    hasLightData = true;
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -293,6 +294,9 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
 
                     // 通知数据更新
                     spectrumListAdapter.notifyDataSetChanged();
+
+                    // 保存了暗数据
+                    hasDarkData = true;
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -415,8 +419,16 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
                     if (true == (Boolean) serialData.get(i).get(Command.SPECTRUM_ITEM_STATUS_KEY)) {
                         // 如果数据表显示则删除数据表显示
                         Boolean isShow = (Boolean) serialData.get(i).get(Command.SPECTRUM_ITEM_SHOW_KEY);
+                        String name = (String) serialData.get(i).get(Command.SPECTRUM_ITEM_NAME_KEY);
                         if (isShow) {
                             removeSpectrumLine(serialData.get(i));
+                        }
+                        if (name.equals(Command.DARK_DATA)) {
+                            hasDarkData = false;
+                        }
+                        if (name.equals(Command.LIGHT_DATA)) {
+                            // 保存了亮数据
+                            hasLightData = false;
                         }
 
                         // 删除数据
@@ -479,6 +491,36 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
 
     public DataPreprocessingDialog getDataPreprocessingDialog() {
         return dataPreprocessingDialog;
+    }
+
+    public boolean hasLightData() {
+        return hasLightData;
+    }
+
+    public boolean hasDarkData() {
+        return hasDarkData;
+    }
+
+    public ArrayList<Byte> getLightData() {
+        for (int i = 0; i < serialData.size(); i++) {
+            String name = (String) serialData.get(i).get(Command.SPECTRUM_ITEM_NAME_KEY);
+            if (name.equals(Command.LIGHT_DATA)) {
+                return (ArrayList<Byte>) serialData.get(i).get(Command.SPECTRUM_ITEM_DATA_KEY);
+            }
+        }
+
+        return null;
+    }
+
+    public ArrayList<Byte> getDarkData() {
+        for (int i = 0; i < serialData.size(); i++) {
+            String name = (String) serialData.get(i).get(Command.SPECTRUM_ITEM_NAME_KEY);
+            if (name.equals(Command.DARK_DATA)) {
+                return (ArrayList<Byte>) serialData.get(i).get(Command.SPECTRUM_ITEM_DATA_KEY);
+            }
+        }
+
+        return null;
     }
 
     // 启动自动读取定时器
