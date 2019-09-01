@@ -97,6 +97,8 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
 
     // 保存当前的指令
     private String currentCommand = StringUtils.EMPTY;
+    // 系统已经准备完毕
+    private boolean isSysReady = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -206,6 +208,17 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
                         saveDarkSpectrumBtn.setEnabled(true);
                         readSpectrumBtn.setEnabled(true);
                         toggleAutoReadSpectrumBtn.setEnabled(true);
+
+                        try {
+                            // 读取串口数据时清空串口缓存数据
+                            serialDataBuffer.clear();
+                            // 发送读取光谱的指令
+                            uartDevice.write(Command.READ_INTERNAL_TEMPERATURE.getBytes(), Command.READ_INTERNAL_TEMPERATURE.getBytes().length);
+                            // 设置当前指令类型
+                            currentCommand = Command.READ_INTERNAL_TEMPERATURE;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     } catch (IOException e) {
                         Log.w(TAG, "Unable to access UART device", e);
                     }
@@ -230,6 +243,20 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         saveLightSpectrumBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!isSysReady) {
+                    Toast.makeText(MainActivity.this,
+                            getResources().getString(R.string.preprocessing_adjust_system_text),
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                if (serialDataBuffer.size() == 0) {
+                    Toast.makeText(MainActivity.this,
+                            getResources().getString(R.string.preprocessing_no_data_text),
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 try {
                     ArrayList<Byte> data = Command.DeepCopy(serialDataBuffer);
 
@@ -268,6 +295,20 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         saveDarkSpectrumBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!isSysReady) {
+                    Toast.makeText(MainActivity.this,
+                            getResources().getString(R.string.preprocessing_adjust_system_text),
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                if (serialDataBuffer.size() == 0) {
+                    Toast.makeText(MainActivity.this,
+                            getResources().getString(R.string.preprocessing_no_data_text),
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 try {
                     ArrayList<Byte> data = Command.DeepCopy(serialDataBuffer);
 
@@ -306,6 +347,13 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         readSpectrumBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!isSysReady) {
+                    Toast.makeText(MainActivity.this,
+                            getResources().getString(R.string.preprocessing_adjust_system_text),
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 try {
                     // 读取串口数据时清空串口缓存数据
                     serialDataBuffer.clear();
@@ -322,6 +370,15 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         toggleAutoReadSpectrumBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (!isSysReady) {
+                    Toast.makeText(MainActivity.this,
+                            getResources().getString(R.string.preprocessing_adjust_system_text),
+                            Toast.LENGTH_LONG).show();
+
+                    toggleAutoReadSpectrumBtn.setChecked(false);
+                    return;
+                }
+
                 if (isChecked) {
                     if (toggleAutoReadSpectrumIntervalEdt.getText().toString().equals(StringUtils.EMPTY) ||
                             Integer.valueOf(toggleAutoReadSpectrumIntervalEdt.getText().toString()) >= 5) {
@@ -469,13 +526,34 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
             }
 
             if (Command.READ_SPECTRUM.equals(currentCommand)) {
-                if (serialDataBuffer.size() >= Command.MAX_SPECTRUM_DATA_LENGTH) {
+                if (serialDataBuffer.size() == Command.MAX_SPECTRUM_DATA_LENGTH) {
                     // 启动数据处理线程，优化性能
                     new SerialAsyncTask(this).execute(serialDataBuffer.toArray(new Byte[]{}));
                     if (!toggleAutoReadSpectrumBtn.isChecked()) {
                         // 显示经度对话框
+                        dataPreprocessingDialog.setTextId(R.string.preprocessing_read_data_text);
                         dataPreprocessingDialog.show(getSupportFragmentManager(), MainActivity.class.getName());
                     }
+                }
+            }
+
+            if (Command.READ_INTERNAL_TEMPERATURE.equals(currentCommand)) {
+                if (serialDataBuffer.size() > Command.MAX_TEMPERATURE_DATA_LENGTH) {
+                    try {
+                        // 读取串口数据时清空串口缓存数据
+                        serialDataBuffer.clear();
+                        // 发送读取光谱的指令
+                        uartDevice.write(Command.READ_INTERNAL_TEMPERATURE.getBytes(), Command.READ_INTERNAL_TEMPERATURE.getBytes().length);
+                        // 设置当前指令类型
+                        currentCommand = Command.READ_INTERNAL_TEMPERATURE;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (serialDataBuffer.size() == Command.MAX_TEMPERATURE_DATA_LENGTH) {
+                    // 接收数据正确后才可以操作
+                    isSysReady = true;
+                    serialDataBuffer.clear();
                 }
             }
         }

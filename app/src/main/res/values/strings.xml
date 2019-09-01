@@ -16,4 +16,8 @@
     <string name="line_chart_no_data">暂无数据</string>
     <string name="line_chart_description">无损检测光谱</string>
 
+    <string name="preprocessing_read_data_text">读取数据中&#8230;</string>
+    <string name="preprocessing_adjust_system_text">系统适配中&#8230;</string>
+    <string name="preprocessing_no_data_text">没有数据，先读光谱数据&#8230;</string>
+
 </resources>

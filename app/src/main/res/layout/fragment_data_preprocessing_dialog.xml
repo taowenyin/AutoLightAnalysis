@@ -4,11 +4,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/progress_img"
-        android:layout_width="@dimen/preprocessing_gif_size"
-        android:layout_height="@dimen/preprocessing_gif_size"
-        android:layout_centerInParent="true"
-        android:src="@drawable/animator_progress"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_centerInParent="true">
+
+        <ImageView
+            android:id="@+id/progress_img"
+            android:layout_width="@dimen/preprocessing_gif_size"
+            android:layout_height="@dimen/preprocessing_gif_size"
+            android:src="@drawable/animator_progress"/>
+
+        <TextView
+            android:id="@+id/progress_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"/>
+
+    </LinearLayout>
+
+
 
 </RelativeLayout>

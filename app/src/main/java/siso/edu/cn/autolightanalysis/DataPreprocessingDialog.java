@@ -13,10 +13,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 public class DataPreprocessingDialog extends DialogFragment {
 
     private View rootView = null;
+    private int textId = 0;
 
     @Nullable
     @Override
@@ -34,7 +36,14 @@ public class DataPreprocessingDialog extends DialogFragment {
             ((Animatable) drawable).start();
         }
 
+        TextView progressText = rootView.findViewById(R.id.progress_text);
+        progressText.setText(textId);
+
         return rootView;
+    }
+
+    public void setTextId(int textId) {
+        this.textId = textId;
     }
 
 }
