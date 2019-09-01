@@ -47,7 +47,7 @@ public class SerialAsyncTask extends AsyncTask<Byte, Void, Void> {
             byte byte2 = spectrumData[i + 2];
             byte byte3 = spectrumData[i + 3];
 
-            int data = ((byte3 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte1 & 0xFF) << 8) | ((byte0 & 0xFF));
+            float data = ((byte3 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte1 & 0xFF) << 8) | ((byte0 & 0xFF));
 
             if (activity.hasDarkData() && activity.hasLightData()) {
 
