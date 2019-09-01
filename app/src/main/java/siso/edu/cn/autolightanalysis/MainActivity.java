@@ -535,7 +535,7 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         byte[] spectrumData = ArrayUtils.toPrimitive(spectrumDataList.toArray(new Byte[]{}));
 
         // 填充数据集
-        for (int i = 0; i < spectrumData.length; i += 4) {
+        for (int i = 0, j = 0; i < spectrumData.length; i += 4, j++) {
             byte byte0 = spectrumData[i];
             byte byte1 = spectrumData[i + 1];
             byte byte2 = spectrumData[i + 2];
@@ -543,7 +543,7 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
 
             int data = ((byte3 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte1 & 0xFF) << 8) | ((byte0 & 0xFF));
 
-            newSpectrumLine.add(new Entry(i, data));
+            newSpectrumLine.add(new Entry(j, data));
         }
 
         // 获取数据名称

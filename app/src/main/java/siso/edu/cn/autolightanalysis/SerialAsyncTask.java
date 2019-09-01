@@ -32,7 +32,7 @@ public class SerialAsyncTask extends AsyncTask<Byte, Void, Void> {
         activity.getNormalSpectrumData().clear();
 
         // 填充数据集
-        for (int i = 0; i < spectrumData.length; i += 4) {
+        for (int i = 0, j = 0; i < spectrumData.length; i += 4, j++) {
             byte byte0 = spectrumData[i];
             byte byte1 = spectrumData[i + 1];
             byte byte2 = spectrumData[i + 2];
@@ -40,7 +40,7 @@ public class SerialAsyncTask extends AsyncTask<Byte, Void, Void> {
 
             int data = ((byte3 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte1 & 0xFF) << 8) | ((byte0 & 0xFF));
 
-            activity.getNormalSpectrumData().add(new Entry(i, data));
+            activity.getNormalSpectrumData().add(new Entry(j, data));
         }
 
         // 设置图表数据
