@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
     private Button saveLightSpectrumBtn = null;
     private Button saveDarkSpectrumBtn = null;
     private Button readSpectrumBtn = null;
+    private Button exitBtn = null;
     private Switch toggleAutoReadSpectrumBtn = null;
     private EditText toggleAutoReadSpectrumIntervalEdt = null;
     private LineChart spectrumLineChart = null;
@@ -109,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
         saveLightSpectrumBtn = findViewById(R.id.save_light_spectrum_btn);
         saveDarkSpectrumBtn = findViewById(R.id.save_dark_spectrum_btn);
         readSpectrumBtn = findViewById(R.id.read_spectrum_btn);
+        exitBtn = findViewById(R.id.exit_btn);
         toggleAutoReadSpectrumBtn = findViewById(R.id.toggle_auto_read_spectrum_btn);
         toggleAutoReadSpectrumIntervalEdt = findViewById(R.id.toggle_auto_read_spectrum_interval_edt);
         spectrumLineChart = findViewById(R.id.spectrum_line_chart);
@@ -364,6 +366,13 @@ public class MainActivity extends AppCompatActivity implements UartDeviceCallbac
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+
+        exitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.this.finish();
             }
         });
 

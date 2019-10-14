@@ -18,6 +18,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/activity_padding"
+            android:minHeight="@dimen/button_mini_size"
+            android:minWidth="@dimen/button_mini_size"
+            android:padding="@dimen/button_padding"
             android:checked="false"
             android:textOn="@string/connect_serial_toggle_on_label"
             android:textOff="@string/connect_serial_toggle_off_label"
@@ -77,6 +80,9 @@
                 android:id="@+id/save_light_spectrum_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="@dimen/button_padding"
+                android:minHeight="@dimen/button_mini_size"
+                android:minWidth="@dimen/button_mini_size"
                 android:enabled="false"
                 android:text="@string/save_light_spectrum_label"
                 android:textSize="@dimen/activity_font_size"/>
@@ -85,6 +91,9 @@
                 android:id="@+id/save_dark_spectrum_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="@dimen/button_padding"
+                android:minHeight="@dimen/button_mini_size"
+                android:minWidth="@dimen/button_mini_size"
                 android:enabled="false"
                 android:text="@string/save_dark_spectrum_label"
                 android:textSize="@dimen/activity_font_size"/>
@@ -93,6 +102,9 @@
                 android:id="@+id/read_spectrum_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:padding="@dimen/button_padding"
+                android:minHeight="@dimen/button_mini_size"
+                android:minWidth="@dimen/button_mini_size"
                 android:enabled="false"
                 android:text="@string/read_spectrum_label"
                 android:textSize="@dimen/activity_font_size"/>
@@ -123,6 +135,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/auto_read_spectrum_unit_label"
+                android:textSize="@dimen/activity_font_size" />
+
+            <Button
+                android:id="@+id/exit_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/button_padding"
+                android:minHeight="@dimen/button_mini_size"
+                android:minWidth="@dimen/button_mini_size"
+                android:text="@string/exit_app_label"
                 android:textSize="@dimen/activity_font_size"/>
 
         </LinearLayout>

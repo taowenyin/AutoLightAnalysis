@@ -5,7 +5,7 @@
     <dimen name="list_margin">5dp</dimen>
     <dimen name="activity_margin_padding_0">0dp</dimen>
     <!--默认字体大小-->
-    <dimen name="activity_font_size">12sp</dimen>
+    <dimen name="activity_font_size">10sp</dimen>
     <!--线性图表的标题-->
     <dimen name="line_chart_description_font_size">8sp</dimen>
     <!--预处理GIF-->
@@ -19,4 +19,8 @@
     <dimen name="spectrum_item_v_padding">2dp</dimen>
     <!--光谱列表的分隔线高度-->
     <dimen name="spectrum_item_divider_height">2dp</dimen>
+    <!--按钮的内边距-->
+    <dimen name="button_padding">15dp</dimen>
+    <!--按钮的最小大小-->
+    <dimen name="button_mini_size">0dp</dimen>
 </resources>
