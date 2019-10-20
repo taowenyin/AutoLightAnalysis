@@ -4,133 +4,116 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingRight="@dimen/activity_padding"
-    android:paddingLeft="@dimen/activity_padding"
-    android:orientation="horizontal"
+    android:paddingEnd="@dimen/activity_padding"
+    android:paddingStart="@dimen/activity_padding"
+    android:paddingBottom="@dimen/activity_padding"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <RelativeLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
         <ToggleButton
             android:id="@+id/connect_device_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="@dimen/button_height"
+            android:minHeight="@dimen/button_mini_size"
+            android:minWidth="@dimen/button_mini_size"
             android:checked="false"
             android:textOn="@string/connect_serial_toggle_on_label"
             android:textOff="@string/connect_serial_toggle_off_label"
             android:textSize="@dimen/activity_font_size"/>
 
-        <ListView
-            android:id="@+id/spectrum_list"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/save_light_spectrum_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="@dimen/button_height"
+            android:minHeight="@dimen/button_mini_size"
+            android:minWidth="@dimen/button_mini_size"
+            android:enabled="false"
+            android:text="@string/save_light_spectrum_label"
+            android:textSize="@dimen/activity_font_size"/>
+
+        <Button
+            android:id="@+id/save_dark_spectrum_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="@dimen/button_height"
+            android:minHeight="@dimen/button_mini_size"
+            android:minWidth="@dimen/button_mini_size"
+            android:enabled="false"
+            android:text="@string/save_dark_spectrum_label"
+            android:textSize="@dimen/activity_font_size"/>
+
+        <Button
+            android:id="@+id/read_spectrum_btn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="@dimen/button_height"
+            android:minHeight="@dimen/button_mini_size"
+            android:minWidth="@dimen/button_mini_size"
+            android:enabled="false"
+            android:text="@string/read_spectrum_label"
+            android:textSize="@dimen/activity_font_size"/>
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/connect_device_btn"
-            android:divider="@android:color/darker_gray"/>
+            android:text="@string/auto_read_spectrum_label"
+            android:textSize="@dimen/activity_font_size"/>
 
-        <LinearLayout
-            android:id="@+id/spectrum_list_operate_bar"
-            android:layout_width="match_parent"
+        <Switch
+            android:id="@+id/toggle_auto_read_spectrum_btn"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:visibility="gone">
+            android:enabled="false" />
 
-            <ImageButton
-                android:id="@+id/spectrum_item_undo"
-                android:layout_width="0dp"
-                android:layout_height="24dp"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_undo_36dp"
-                android:scaleType="fitCenter"/>
-
-            <ImageButton
-                android:id="@+id/spectrum_item_delete"
-                android:layout_width="0dp"
-                android:layout_height="24dp"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_delete_36dp"
-                android:scaleType="fitCenter"/>
-
-        </LinearLayout>
-
-    </RelativeLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="5"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <EditText
+            android:id="@+id/toggle_auto_read_spectrum_interval_edt"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:inputType="number"
+            android:hint="@string/auto_read_spectrum_hint_label"
+            android:autofillHints="@string/auto_read_spectrum_hint_label"
+            android:gravity="center"
+            android:textSize="@dimen/activity_font_size"/>
 
-            <Button
-                android:id="@+id/save_light_spectrum_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:enabled="false"
-                android:text="@string/save_light_spectrum_label"
-                android:textSize="@dimen/activity_font_size"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/auto_read_spectrum_unit_label"
+            android:textSize="@dimen/activity_font_size" />
 
-            <Button
-                android:id="@+id/save_dark_spectrum_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:enabled="false"
-                android:text="@string/save_dark_spectrum_label"
-                android:textSize="@dimen/activity_font_size"/>
-
-            <Button
-                android:id="@+id/read_spectrum_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:enabled="false"
-                android:text="@string/read_spectrum_label"
-                android:textSize="@dimen/activity_font_size"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/auto_read_spectrum_label"
-                android:textSize="@dimen/activity_font_size"/>
-
-            <Switch
-                android:id="@+id/toggle_auto_read_spectrum_btn"
-                android:layout_width="wrap_content"
-                android:enabled="false"
-                android:layout_height="wrap_content" />
-
-            <EditText
-                android:id="@+id/toggle_auto_read_spectrum_interval_edt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:hint="@string/auto_read_spectrum_hint_label"
-                android:autofillHints="@string/auto_read_spectrum_hint_label"
-                android:gravity="center"
-                android:textSize="@dimen/activity_font_size"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/auto_read_spectrum_unit_label"
-                android:textSize="@dimen/activity_font_size"/>
-
-        </LinearLayout>
-
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/spectrum_line_chart"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+        <ImageButton
+            android:id="@+id/exit_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height"
+            android:paddingTop="@dimen/button_padding"
+            android:paddingBottom="@dimen/button_padding"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_power_off_36dp"/>
 
     </LinearLayout>
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/analysis_table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="@dimen/tab_elevation"
+        app:tabMode="scrollable"
+        app:tabIndicatorHeight="@dimen/tab_indicator_height"
+        app:tabIndicatorColor="@android:color/holo_blue_dark" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/analysis_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
 </LinearLayout>

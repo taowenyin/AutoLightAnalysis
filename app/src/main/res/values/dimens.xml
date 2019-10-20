@@ -19,8 +19,16 @@
     <dimen name="spectrum_item_v_padding">2dp</dimen>
     <!--光谱列表的分隔线高度-->
     <dimen name="spectrum_item_divider_height">2dp</dimen>
+    <!--按钮的高度-->
+    <dimen name="button_height">40dp</dimen>
     <!--按钮的内边距-->
-    <dimen name="button_padding">15dp</dimen>
+    <dimen name="button_padding">10dp</dimen>
     <!--按钮的最小大小-->
     <dimen name="button_mini_size">0dp</dimen>
+    <!--标签指示器的大小-->
+    <dimen name="tab_indicator_height">2dp</dimen>
+    <!--标签的大小-->
+    <dimen name="tab_height">35dp</dimen>
+    <!--标签指示器的间距-->
+    <dimen name="tab_elevation">10dp</dimen>
 </resources>

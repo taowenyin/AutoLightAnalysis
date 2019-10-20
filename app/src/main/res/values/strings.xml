@@ -21,4 +21,11 @@
     <string name="preprocessing_adjust_system_text">系统适配中&#8230;</string>
     <string name="preprocessing_no_data_text">没有数据，先读光谱数据&#8230;</string>
 
+    <string name="table_base_info_text">基本信息</string>
+    <string name="table_spectrum_text">光谱采集</string>
+    <string name="table_index_text">指标预测</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>
