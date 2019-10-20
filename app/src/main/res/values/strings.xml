@@ -24,8 +24,65 @@
     <string name="table_base_info_text">基本信息</string>
     <string name="table_spectrum_text">光谱采集</string>
     <string name="table_index_text">指标预测</string>
+    <string name="table_prediction_text">货架期预测</string>
+    <string name="table_preference_text">系统设置</string>
+    <string name="table_about_text">帮助</string>
+
+    <string-array name="product_type_array">
+        <item>牛肉</item>
+        <item>猪肉</item>
+    </string-array>
+    <string name="product_type_label">产品种类：</string>
+
+    <string name="is_packing_label">是否包装：</string>
+
+    <string name="packing_type_label">包装材料：</string>
+    <string-array name="packing_type_array">
+        <item>PE</item>
+        <item>PET</item>
+        <item>PA</item>
+        <item>CPP</item>
+        <item>PA/PE</item>
+        <item>PA/CPP</item>
+        <item>PET/CPP</item>
+        <item>PET/PE</item>
+    </string-array>
+
+    <string name="packing_form_label">包装形式：</string>
+    <string-array name="packing_form_array">
+        <item>包装薄膜</item>
+        <item>产品接触</item>
+    </string-array>
+
+    <string name="is_yes">是</string>
+    <string name="is_no">否</string>
+
+    <string name="index_dmb_label">脱氧肌红蛋白：</string>
+    <string name="index_omb_label">氧合肌红蛋白：</string>
+    <string name="index_mmb_label">高铁肌红蛋白：</string>
+    <string name="index_ph_label">PH值：</string>
+    <string name="index_bacteria_label">菌落总数：</string>
+    <string name="index_vbn_label">挥发性盐基氮：</string>
+    <string name="index_zero_label">0</string>
+
+    <string name="about_about_label">关于：</string>
+    <string name="about_content">一共智能无损肉制品检测仪</string>
+    <string name="about_connect_label">联系我们</string>
+    <string name="about_connect_twy">陶文寅（taowy@siso.edu.cn）</string>
+    <string name="about_connect_pl">潘嘹（panl@jnu.edu.cn）</string>
+    <string name="about_usage_label">使用方法：</string>
+    <string name="about_usage">打开设备选择相关选项就可以进行检测</string>
+
+    <string name="preference_smooth_category_label">平滑设置</string>
+    <string name="preference_smooth_label">是否平滑</string>
+    <string name="preference_smooth_key">smooth</string>
+    <string name="preference_smooth_count_label">平滑次数</string>
+    <string name="preference_smooth_count_key">smooth_count</string>
+    <string name="preference_integration_category_label">积分设置</string>
+    <string name="preference_integration_time_label">积分时间</string>
+    <string name="preference_integration_time_key">integration_time</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_blank_fragment">功能开发中，敬请期待！</string>
 
 </resources>

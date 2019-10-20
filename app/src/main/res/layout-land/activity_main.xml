@@ -111,10 +111,11 @@
         app:tabIndicatorHeight="@dimen/tab_indicator_height"
         app:tabIndicatorColor="@android:color/holo_blue_dark" />
 
-    <android.support.v4.view.ViewPager
+    <siso.edu.cn.autolightanalysis.NoScrollViewPager
         android:id="@+id/analysis_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:paddingTop="@dimen/analysis_content_padding"/>
 
 </LinearLayout>

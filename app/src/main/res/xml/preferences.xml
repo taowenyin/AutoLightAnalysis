@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <android.support.v7.preference.PreferenceCategory
+        android:title="@string/preference_smooth_category_label">
+
+        <SwitchPreference
+            android:key="@string/preference_smooth_key"
+            android:title="@string/preference_smooth_label"
+            android:defaultValue="false"/>
+
+        <EditTextPreference
+            android:key="@string/preference_smooth_count_key"
+            android:title="@string/preference_smooth_count_label"
+            android:dialogMessage="@string/preference_smooth_count_label"
+            android:inputType="number"
+            android:defaultValue="0"/>
+
+    </android.support.v7.preference.PreferenceCategory>
+
+    <android.support.v7.preference.PreferenceCategory
+        android:title="@string/preference_integration_category_label">
+
+        <EditTextPreference
+            android:key="@string/preference_integration_time_key"
+            android:title="@string/preference_integration_time_label"
+            android:dialogMessage="@string/preference_integration_time_label"
+            android:inputType="number"
+            android:defaultValue="0"/>
+
+    </android.support.v7.preference.PreferenceCategory>
+
+</android.support.v7.preference.PreferenceScreen>

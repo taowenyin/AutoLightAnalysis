@@ -31,4 +31,14 @@
     <dimen name="tab_height">35dp</dimen>
     <!--标签指示器的间距-->
     <dimen name="tab_elevation">10dp</dimen>
+    <!--分析内容的间距-->
+    <dimen name="analysis_content_padding">5dp</dimen>
+    <!--指标页面的标签宽度-->
+    <dimen name="index_label_width">100dp</dimen>
+    <!--指标页面的外边距-->
+    <dimen name="index_item_margin">5dp</dimen>
+
+    <!--帮助页面的设置-->
+    <dimen name="about_image_size">50dp</dimen>
+    <dimen name="about_margin">10dp</dimen>
 </resources>

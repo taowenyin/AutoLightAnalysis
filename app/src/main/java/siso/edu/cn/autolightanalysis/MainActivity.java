@@ -51,7 +51,10 @@ public class MainActivity extends AppCompatActivity implements
         AnalysisSpectrumFragment.OnFragmentInteractionListener,
         AnalysisSpectrumFragment.OnHasDarkDataListener,
         AnalysisSpectrumFragment.OnHasLightDataListener,
-        AnalysisIndexFragment.OnFragmentInteractionListener {
+        AnalysisIndexFragment.OnFragmentInteractionListener,
+        AnalysisPredictionFragment.OnFragmentInteractionListener,
+        PreferenceFragment.OnFragmentInteractionListener,
+        AboutFragment.OnFragmentInteractionListener {
 
     public static final String TAG = "===MainActivity===";
     private static final String UART_DEVICE_NAME = "UART0";
@@ -64,12 +67,10 @@ public class MainActivity extends AppCompatActivity implements
     private Switch toggleAutoReadSpectrumBtn = null;
     private EditText toggleAutoReadSpectrumIntervalEdt = null;
 
-
     private DataPreprocessingDialog dataPreprocessingDialog = new DataPreprocessingDialog();
 
-
     private TabLayout analysisTable = null;
-    private ViewPager analysisContent = null;
+    private NoScrollViewPager analysisContent = null;
     private List<String> analysisTableIndicators = new ArrayList<String>();
 
     private UartDevice uartDevice = null;
@@ -119,14 +120,24 @@ public class MainActivity extends AppCompatActivity implements
         analysisTable = findViewById(R.id.analysis_table);
         analysisContent = findViewById(R.id.analysis_content);
 
+        // 不可侧滑
+        analysisContent.setNoScroll(true);
+
         // 设置标签页的关联页面
         analysisTableIndicators.add(this.getResources().getString(R.string.table_base_info_text));
         analysisTableIndicators.add(this.getResources().getString(R.string.table_spectrum_text));
         analysisTableIndicators.add(this.getResources().getString(R.string.table_index_text));
+        analysisTableIndicators.add(this.getResources().getString(R.string.table_prediction_text));
+        analysisTableIndicators.add(this.getResources().getString(R.string.table_preference_text));
+        analysisTableIndicators.add(this.getResources().getString(R.string.table_about_text));
 
         analysisFragments.add(AnalysisBaseInfoFragment.newInstance(this.getResources().getString(R.string.table_base_info_text)));
         analysisFragments.add(AnalysisSpectrumFragment.newInstance(this.getResources().getString(R.string.table_spectrum_text)));
         analysisFragments.add(AnalysisIndexFragment.newInstance(this.getResources().getString(R.string.table_index_text)));
+        analysisFragments.add(AnalysisPredictionFragment.newInstance(this.getResources().getString(R.string.table_prediction_text)));
+        analysisFragments.add(PreferenceFragment.newInstance(this.getResources().getString(R.string.table_preference_text)));
+        analysisFragments.add(AboutFragment.newInstance(this.getResources().getString(R.string.table_about_text)));
+
         analysisContent.setAdapter(new AnalysisPageAdapter(getSupportFragmentManager(), analysisFragments, analysisTableIndicators));
         analysisTable.setupWithViewPager(analysisContent);
 
