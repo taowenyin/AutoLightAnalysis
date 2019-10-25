@@ -61,34 +61,6 @@
             android:text="@string/read_spectrum_label"
             android:textSize="@dimen/activity_font_size"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/auto_read_spectrum_label"
-            android:textSize="@dimen/activity_font_size"/>
-
-        <Switch
-            android:id="@+id/toggle_auto_read_spectrum_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:enabled="false" />
-
-        <EditText
-            android:id="@+id/toggle_auto_read_spectrum_interval_edt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:hint="@string/auto_read_spectrum_hint_label"
-            android:autofillHints="@string/auto_read_spectrum_hint_label"
-            android:gravity="center"
-            android:textSize="@dimen/activity_font_size"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/auto_read_spectrum_unit_label"
-            android:textSize="@dimen/activity_font_size" />
-
         <ImageButton
             android:id="@+id/exit_btn"
             android:layout_width="wrap_content"
@@ -104,16 +76,18 @@
     <android.support.design.widget.TabLayout
         android:id="@+id/analysis_table"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/tab_height"
         android:elevation="@dimen/tab_elevation"
+        android:background="@color/colorGray"
         app:tabMode="scrollable"
         app:tabIndicatorHeight="@dimen/tab_indicator_height"
         app:tabIndicatorColor="@android:color/holo_blue_dark" />
 
-    <android.support.v4.view.ViewPager
+    <siso.edu.cn.autolightanalysis.NoScrollViewPager
         android:id="@+id/analysis_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:paddingTop="@dimen/analysis_content_padding"/>
 
 </LinearLayout>

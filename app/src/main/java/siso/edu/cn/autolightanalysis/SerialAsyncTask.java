@@ -28,17 +28,21 @@ public class SerialAsyncTask extends AsyncTask<Byte, Void, Void> {
     @Override
     protected Void doInBackground(Byte... bytes) {
 
+        // 把接收到的串口数据转化为字节数组
         byte[] spectrumData = ArrayUtils.toPrimitive(bytes);
-        byte[] lightData = null;
-        byte[] darkData = null;
+        float[] lightData = null;
+        float[] darkData = null;
 
+        // 如果光谱的亮、暗基准数据存在，那么就获取
         if (activity.hasDarkData() && activity.hasLightData()) {
-            lightData = ArrayUtils.toPrimitive(activity.getLightData().toArray(new Byte[]{}));
-            darkData = ArrayUtils.toPrimitive(activity.getDarkData().toArray(new Byte[]{}));
+            lightData = ArrayUtils.toPrimitive(activity.getLightData().toArray(new Float[]{}));
+            darkData = ArrayUtils.toPrimitive(activity.getDarkData().toArray(new Float[]{}));
         }
 
-        // 清空数据
+        // 清空实时串口图表数据对象
         activity.getNormalSpectrumData().clear();
+        // 清空实时串口数据对象
+        activity.getNormalData().clear();
 
         // 填充数据集
         for (int i = 0, j = 0; i < spectrumData.length; i += 4, j++) {
@@ -49,42 +53,42 @@ public class SerialAsyncTask extends AsyncTask<Byte, Void, Void> {
 
             float data = ((byte3 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte1 & 0xFF) << 8) | ((byte0 & 0xFF));
 
+            // 加入有数据
             if (activity.hasDarkData() && activity.hasLightData()) {
 
-                byte light0 = lightData[i];
-                byte light1 = lightData[i + 1];
-                byte light2 = lightData[i + 2];
-                byte light3 = lightData[i + 3];
-                int light = ((light3 & 0xFF) << 24) | ((light2 & 0xFF) << 16) | ((light1 & 0xFF) << 8) | ((light0 & 0xFF));
-
-                byte dark0 = darkData[i];
-                byte dark1 = darkData[i + 1];
-                byte dark2 = darkData[i + 2];
-                byte dark3 = darkData[i + 3];
-
-                int dark = ((dark3 & 0xFF) << 24) | ((dark2 & 0xFF) << 16) | ((dark1 & 0xFF) << 8) | ((dark0 & 0xFF));
+                // 获得基准数据
+                float light = lightData[i];
+                float dark = darkData[i];
 
                 if (light != dark) {
                     data = (data - dark) / (light - dark);
                 }
             }
 
+            // 添加图表节点对象
             activity.getNormalSpectrumData().add(new Entry(j, data));
+            // 添加数据
+            activity.getNormalData().add(data);
         }
 
-        // 设置图表数据
-        LineDataSet lightDataSet = (LineDataSet) activity.getSpectrumLineChart().getData().getDataSetByIndex(0);
-        lightDataSet.setValues(activity.getNormalSpectrumData());
+        // TODO: 19-10-25
+//        // 设置图表数据
+//        LineDataSet lightDataSet = (LineDataSet) activity.getSpectrumLineChart().getData().getDataSetByIndex(0);
+//        lightDataSet.setValues(activity.getNormalSpectrumData());
 
         return null;
     }
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        // 显示数据
-        activity.getSpectrumLineChart().getData().notifyDataChanged();
-        activity.getSpectrumLineChart().notifyDataSetChanged();
-        activity.getSpectrumLineChart().invalidate();
+        // TODO: 19-10-25
+        // 向Fragment传递数据
+        activity.setFragmentSerialData();
+
+
+//        activity.getSpectrumLineChart().getData().notifyDataChanged();
+//        activity.getSpectrumLineChart().notifyDataSetChanged();
+//        activity.getSpectrumLineChart().invalidate();
 
         // 关闭进度对话框
         if (activity.getDataPreprocessingDialog() != null &&

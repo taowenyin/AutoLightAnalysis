@@ -25,6 +25,8 @@ public class Command {
 
     public static final String NORMAL_TMP_DATA = "Normal";
 
+    // 串口数据
+    public static final String SERIAL_DATA_KEY = "SerialData";
     // 数据线名称
     public static final String SPECTRUM_ITEM_NAME_KEY = "Name";
     // 数据线数据
@@ -35,7 +37,7 @@ public class Command {
     public static final String SPECTRUM_ITEM_SHOW_KEY = "Show";
 
     // 通过序列化和反序列化实现List的深度拷贝
-    public static ArrayList<Byte> DeepCopy(ArrayList<Byte> src) throws IOException, ClassNotFoundException {
+    public static ArrayList<Float> DeepCopy(ArrayList<Float> src) throws IOException, ClassNotFoundException {
 
         // 序列化
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -46,7 +48,7 @@ public class Command {
         ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
         ObjectInputStream objectIn = new ObjectInputStream(byteIn);
 
-        return (ArrayList<Byte>) objectIn.readObject();
+        return (ArrayList<Float>) objectIn.readObject();
     }
 
 }

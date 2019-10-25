@@ -34,6 +34,8 @@ import java.util.Map;
 public class AnalysisSpectrumFragment extends Fragment {
     private static final String ARG_PARAM_TITLE = "title";
 
+    private Context context = null;
+
     private String title = StringUtils.EMPTY;
 
     private OnFragmentInteractionListener mListener = null;
@@ -76,12 +78,17 @@ public class AnalysisSpectrumFragment extends Fragment {
             title = getArguments().getString(ARG_PARAM_TITLE);
         }
 
+        // 初始化接收消息对象
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
             }
         };
+
+        // 传递Handler
+        mainActivity = (MainActivity) context;
+        mainActivity.setHandler(handler);
     }
 
     @Override
@@ -283,9 +290,7 @@ public class AnalysisSpectrumFragment extends Fragment {
                     + " must implement OnFragmentInteractionListener");
         }
 
-        // 传递Handler
-        mainActivity = (MainActivity) context;
-        mainActivity.setHandler(handler);
+        this.context = context;
     }
 
     @Override
