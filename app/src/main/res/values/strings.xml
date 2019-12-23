@@ -32,11 +32,10 @@
         <item>牛肉</item>
         <item>猪肉</item>
     </string-array>
-    <string name="product_type_label">产品种类：</string>
-
-    <string name="is_packing_label">是否包装：</string>
-
-    <string name="packing_type_label">包装材料：</string>
+    <string-array name="product_type_array_value">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
     <string-array name="packing_type_array">
         <item>PE</item>
         <item>PET</item>
@@ -47,11 +46,23 @@
         <item>PET/CPP</item>
         <item>PET/PE</item>
     </string-array>
-
-    <string name="packing_form_label">包装形式：</string>
+    <string-array name="packing_type_array_value">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+    </string-array>
     <string-array name="packing_form_array">
         <item>包装薄膜</item>
         <item>产品接触</item>
+    </string-array>
+    <string-array name="packing_form_array_value">
+        <item>0</item>
+        <item>1</item>
     </string-array>
 
     <string name="is_yes">是</string>
@@ -81,7 +92,21 @@
     <string name="preference_integration_category_label">积分设置</string>
     <string name="preference_integration_time_label">积分时间</string>
     <string name="preference_integration_time_key">integration_time</string>
+    <string name="preference_name">sys_preference</string>
 
+    <string name="preference_type_category_label">品种</string>
+    <string name="preference_type_key">type</string>
+    <string name="preference_type_label">产品种类</string>
+    <string name="preference_packing_category_label">包装</string>
+    <string name="preference_is_packing_label">是否包装</string>
+    <string name="preference_is_packing_key">is_packing</string>
+    <string name="preference_packing_type_label">包装材料</string>
+    <string name="preference_packing_type_key">packing_type</string>
+    <string name="preference_packing_form_label">包装形式</string>
+    <string name="preference_packing_form_key">packing_form</string>
+
+    <string name="preference_uninitialized">未初始化</string>
+    
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">功能开发中，敬请期待！</string>
 

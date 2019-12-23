@@ -3,20 +3,24 @@ package siso.edu.cn.autolightanalysis;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.support.annotation.Nullable;
+
+import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
 
 import org.apache.commons.lang3.StringUtils;
 
 
-public class AnalysisBaseInfoFragment extends Fragment {
+public class AnalysisBaseInfoFragment extends PreferenceFragmentCompat {
     private static final String ARG_PARAM_TITLE = "title";
 
     private String title = StringUtils.EMPTY;
 
     private OnFragmentInteractionListener mListener;
+
+    // Preference监听
+    private PreferenceChangeListener preferenceListener = null;
+
+    public static String TAG = "===AnalysisBaseInfoFragment===";
 
     public AnalysisBaseInfoFragment() {
         // Required empty public constructor
@@ -39,9 +43,10 @@ public class AnalysisBaseInfoFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_analysis_base_info, container, false);
+    public void onCreatePreferencesFix(@Nullable Bundle savedInstanceState, String rootKey) {
+        // 设置配置信息名
+        getPreferenceManager().setSharedPreferencesName(getString(R.string.preference_name));
+        setPreferencesFromResource(R.xml.base, rootKey);
     }
 
     public void onButtonPressed(Uri uri) {
@@ -55,6 +60,8 @@ public class AnalysisBaseInfoFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
+
+            preferenceListener = new PreferenceChangeListener(getContext(), this);
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -65,6 +72,33 @@ public class AnalysisBaseInfoFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(preferenceListener);
+
+        String key = getResources().getString(R.string.preference_type_key);
+        String[] labelArray = getResources().getStringArray(R.array.product_type_array);
+        findPreference(key).setSummary(labelArray[Integer.valueOf(
+                getPreferenceManager().getSharedPreferences().getString(key, getResources().getString(R.string.preference_uninitialized)))]);
+
+        key = getResources().getString(R.string.preference_packing_type_key);
+        labelArray = getResources().getStringArray(R.array.packing_type_array);
+        findPreference(key).setSummary(labelArray[Integer.valueOf(
+                getPreferenceManager().getSharedPreferences().getString(key, getResources().getString(R.string.preference_uninitialized)))]);
+
+        key = getResources().getString(R.string.preference_packing_form_key);
+        labelArray = getResources().getStringArray(R.array.packing_form_array);
+        findPreference(key).setSummary(labelArray[Integer.valueOf(
+                getPreferenceManager().getSharedPreferences().getString(key, getResources().getString(R.string.preference_uninitialized)))]);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(preferenceListener);
     }
 
     public interface OnFragmentInteractionListener {

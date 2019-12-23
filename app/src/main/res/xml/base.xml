@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <android.support.v7.preference.PreferenceCategory
+        android:title="@string/preference_type_category_label">
+
+        <ListPreference
+            android:key="@string/preference_type_key"
+            android:title="@string/preference_type_label"
+            android:entries="@array/product_type_array"
+            android:entryValues="@array/product_type_array_value"
+            android:dialogTitle="@string/preference_type_label"/>
+
+    </android.support.v7.preference.PreferenceCategory>
+
+    <android.support.v7.preference.PreferenceCategory
+        android:title="@string/preference_packing_category_label">
+
+        <SwitchPreference
+            android:key="@string/preference_is_packing_key"
+            android:title="@string/preference_is_packing_label"
+            android:defaultValue="false"/>
+
+        <ListPreference
+            android:key="@string/preference_packing_type_key"
+            android:title="@string/preference_packing_type_label"
+            android:entries="@array/packing_type_array"
+            android:entryValues="@array/packing_type_array_value"
+            android:dialogTitle="@string/preference_packing_type_label"/>
+
+        <ListPreference
+            android:key="@string/preference_packing_form_key"
+            android:title="@string/preference_packing_form_label"
+            android:entries="@array/packing_form_array"
+            android:entryValues="@array/packing_form_array_value"
+            android:dialogTitle="@string/preference_packing_form_label"/>
+
+    </android.support.v7.preference.PreferenceCategory>
+
+</android.support.v7.preference.PreferenceScreen>
