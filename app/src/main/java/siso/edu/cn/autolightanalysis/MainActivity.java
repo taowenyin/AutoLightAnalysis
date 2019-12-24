@@ -1,34 +1,22 @@
 package siso.edu.cn.autolightanalysis;
 
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.Switch;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.google.android.things.pio.PeripheralManager;
 import com.google.android.things.pio.UartDevice;
@@ -42,8 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements
         UartDeviceCallback,
@@ -81,16 +67,22 @@ public class MainActivity extends AppCompatActivity implements
 
     // 串口缓存数据
     private ArrayList<Byte> serialDataBuffer = new ArrayList<Byte>();
-    // 串口数据
-    private ArrayList<Map<String, Object>> serialData = new ArrayList<Map<String, Object>>();
+    // 串口数据转换后的数据
+    private ArrayList<Integer> serialData = null;
+    // 图表串口数据
+    private ArrayList<Map<String, Object>> spectrumSerialData = new ArrayList<Map<String, Object>>();
 
     // 保存当前的指令
     private String currentCommand = StringUtils.EMPTY;
     // 系统已经准备完毕
     private boolean isSysReady = false;
-
+    // 串口接收数据
+    private Handler serialHandler = null;
     // 向标签页发送实时串口数据对象
     private Handler handler = null;
+
+    // 亮和暗数据是否已经保存
+    private boolean hasLightData = false, hasDarkData = false;
 
     // TODO: 19-10-25
     // 接收到的光谱数据
@@ -100,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements
     // 折线图数据集
     private ArrayList<ILineDataSet> spectrumDataSets = new ArrayList<ILineDataSet>();
     // 已经有亮和暗数据
-    private boolean hasLightData = false, hasDarkData = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,6 +127,57 @@ public class MainActivity extends AppCompatActivity implements
         analysisContent.setAdapter(new AnalysisPageAdapter(getSupportFragmentManager(), analysisFragments, analysisTableIndicators));
         // 绑定标签页和标签页内容
         analysisTable.setupWithViewPager(analysisContent);
+
+        // 接收传输数据处理结果
+        serialHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                // 收到串口原始数据
+                if (msg.what == SerialAsyncTask.SERIAL_DATA_MSG_KEY) {
+                    // 获取串口数据
+                    serialData = msg.getData().getIntegerArrayList(SerialAsyncTask.SERIAL_DATA_KEY);
+
+                    for (int i = 0; i < spectrumSerialData.size(); i++) {
+                        Map<String, Object> itemData = spectrumSerialData.get(i);
+                        String name = (String) itemData.get(Command.SPECTRUM_ITEM_NAME_KEY);
+                        if (name.equals(Command.DARK_DATA)) {
+                            hasDarkData = true;
+                        }
+                        if (name.equals(Command.LIGHT_DATA)) {
+                            hasLightData = true;
+                        }
+                    }
+
+                    if (hasLightData && hasDarkData) {
+                        // 启动数据处理线程，优化性能
+                        new CalculateAsyncTask(serialHandler, spectrumSerialData).execute(serialData.toArray(new Integer[]{}));
+                    } else {
+                        Toast.makeText(MainActivity.this,
+                                getResources().getString(R.string.preprocessing_no_light_dark_text),
+                                Toast.LENGTH_LONG).show();
+
+                        // 关闭进度对话框
+                        if (dataPreprocessingDialog != null &&
+                                dataPreprocessingDialog.getDialog() != null &&
+                                dataPreprocessingDialog.getDialog().isShowing()) {
+                            dataPreprocessingDialog.dismiss();
+                        }
+                    }
+                }
+                // 收到经过计算后的数据
+                if (msg.what == CalculateAsyncTask.CALCULATE_DATA_MSG_KEY) {
+                    float[] data = msg.getData().getFloatArray(CalculateAsyncTask.CALCULATE_DATA_KEY);
+                    Log.i(TAG, String.valueOf(data.length));
+
+                    // 关闭进度对话框
+                    if (dataPreprocessingDialog != null &&
+                            dataPreprocessingDialog.getDialog() != null &&
+                            dataPreprocessingDialog.getDialog().isShowing()) {
+                        dataPreprocessingDialog.dismiss();
+                    }
+                }
+            }
+        };
 
         connectDeviceBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -192,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 // 判断是否已经收到了光谱数据
-                if (normalData.size() == 0) {
+                if (serialData == null) {
                     Toast.makeText(MainActivity.this,
                             getResources().getString(R.string.preprocessing_no_data_text),
                             Toast.LENGTH_LONG).show();
@@ -201,22 +244,14 @@ public class MainActivity extends AppCompatActivity implements
 
                 try {
                     // 对数据进行深度拷贝
-                    ArrayList<Float> data = Command.DeepCopy(normalData);
+                    ArrayList<Integer> data = Command.DeepCopyInteger(serialData);
 
                     // 如果列表中已经有数据，那么就更新数据
-                    for (int i = 0; i < serialData.size(); i++) {
-                        if (serialData.get(i).get(Command.SPECTRUM_ITEM_NAME_KEY).equals(Command.LIGHT_DATA)) {
-                            serialData.get(i).put(Command.SPECTRUM_ITEM_DATA_KEY, data);
+                    for (int i = 0; i < spectrumSerialData.size(); i++) {
+                        if (spectrumSerialData.get(i).get(Command.SPECTRUM_ITEM_NAME_KEY).equals(Command.LIGHT_DATA)) {
+                            spectrumSerialData.get(i).put(Command.SPECTRUM_ITEM_DATA_KEY, data);
 
-                            // TODO: 19-10-25 把数据送到Fragment
-
-//                            // 通知Fragment更新数据
-//                            Message serialDataMsg = new Message();
-//                            Bundle bundle = new Bundle();
-//                            bundle.putParcelableArrayList(serialData);
-//                            serialDataMsg.setData(bundle);
-//
-//                            handler.sendMessage(serialDataMsg);
+                            updateSpectrumView(spectrumSerialData);
 
                             return;
                         }
@@ -228,20 +263,9 @@ public class MainActivity extends AppCompatActivity implements
                     itemData.put(Command.SPECTRUM_ITEM_DATA_KEY, data);
                     itemData.put(Command.SPECTRUM_ITEM_STATUS_KEY, false);
                     itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, false);
+                    spectrumSerialData.add(itemData);
 
-                    serialData.add(itemData);
-
-                    // TODO: 19-10-25 把数据送到Fragment
-//                    // 通知Fragment更新数据
-//                    Message serialDataMsg = new Message();
-//                    Bundle bundle = new Bundle();
-//                    bundle.putParcelableArrayList(serialData);
-//                    serialDataMsg.setData(bundle);
-//
-//                    handler.sendMessage(serialDataMsg);
-
-                    // 保存了亮数据
-                    hasLightData = true;
+                    updateSpectrumView(spectrumSerialData);
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -259,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 // 判断是否已经收到了光谱数据
-                if (normalData.size() == 0) {
+                if (serialData == null) {
                     Toast.makeText(MainActivity.this,
                             getResources().getString(R.string.preprocessing_no_data_text),
                             Toast.LENGTH_LONG).show();
@@ -268,20 +292,14 @@ public class MainActivity extends AppCompatActivity implements
 
                 try {
                     // 对数据进行深度拷贝
-                    ArrayList<Float> data = Command.DeepCopy(normalData);
+                    ArrayList<Integer> data = Command.DeepCopyInteger(serialData);
 
                     // 如果列表中已经有数据，那么就更新数据
-                    for (int i = 0; i < serialData.size(); i++) {
-                        if (serialData.get(i).get(Command.SPECTRUM_ITEM_NAME_KEY).equals(Command.DARK_DATA)) {
-                            serialData.get(i).put(Command.SPECTRUM_ITEM_DATA_KEY, data);
+                    for (int i = 0; i < spectrumSerialData.size(); i++) {
+                        if (spectrumSerialData.get(i).get(Command.SPECTRUM_ITEM_NAME_KEY).equals(Command.DARK_DATA)) {
+                            spectrumSerialData.get(i).put(Command.SPECTRUM_ITEM_DATA_KEY, data);
 
-                            // TODO: 19-10-25 把数据送到Fragment
-//                            // 通知Fragment更新数据
-//                            Message serialDataMsg = new Message();
-//                            Bundle bundle = new Bundle();
-//                            bundle.putFloatArray(Command.SERIAL_DATA_KEY,
-//                                    ArrayUtils.toPrimitive(normalData.toArray(new Float[]{})));
-//                            serialDataMsg.setData(bundle);
+                            updateSpectrumView(spectrumSerialData);
 
                             return;
                         }
@@ -293,18 +311,9 @@ public class MainActivity extends AppCompatActivity implements
                     itemData.put(Command.SPECTRUM_ITEM_DATA_KEY, data);
                     itemData.put(Command.SPECTRUM_ITEM_STATUS_KEY, false);
                     itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, false);
+                    spectrumSerialData.add(itemData);
 
-                    serialData.add(itemData);
-
-                    // TODO: 19-10-25 把数据送到Fragment
-//                    // 通知Fragment更新数据
-//                    Message serialDataMsg = new Message();
-//                    Bundle bundle = new Bundle();
-//                    bundle.putParcelableArrayList(serialData);
-//                    serialDataMsg.setData(bundle);
-
-                    // 保存了暗数据
-                    hasDarkData = true;
+                    updateSpectrumView(spectrumSerialData);
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -343,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     // 串口配置
-    public void configureUartFrame(UartDevice uart) throws IOException {
+    private void configureUartFrame(UartDevice uart) throws IOException {
         uart.setBaudrate(115200);
         uart.setDataSize(8);
         uart.setParity(UartDevice.PARITY_NONE);
@@ -351,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     // 串口数据读取函数
-    public void readUartBuffer(UartDevice uart) throws IOException {
+    private void readUartBuffer(UartDevice uart) throws IOException {
         final int BUFFER_SIZE = 200;
         byte[] buffer = new byte[BUFFER_SIZE];
 
@@ -362,16 +371,18 @@ public class MainActivity extends AppCompatActivity implements
                 serialDataBuffer.add(buffer[i]);
             }
 
+            // 读取光谱数据
             if (Command.READ_SPECTRUM.equals(currentCommand)) {
                 if (serialDataBuffer.size() == Command.MAX_SPECTRUM_DATA_LENGTH) {
                     // 启动数据处理线程，优化性能
-                    new SerialAsyncTask(this).execute(serialDataBuffer.toArray(new Byte[]{}));
+                    new SerialAsyncTask(serialHandler).execute(serialDataBuffer.toArray(new Byte[]{}));
                     // 显示经度对话框
                     dataPreprocessingDialog.setTextId(R.string.preprocessing_read_data_text);
                     dataPreprocessingDialog.show(getSupportFragmentManager(), MainActivity.class.getName());
                 }
             }
 
+            // 读取内部温度数据
             if (Command.READ_INTERNAL_TEMPERATURE.equals(currentCommand)) {
                 if (serialDataBuffer.size() != Command.MAX_TEMPERATURE_DATA_LENGTH) {
                     try {
@@ -393,48 +404,23 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public DataPreprocessingDialog getDataPreprocessingDialog() {
-        return dataPreprocessingDialog;
-    }
+    // TODO: 19-12-24
+    // 更新图表
+    private void updateSpectrumView(ArrayList<Map<String, Object>> data) {
+//        // 通知Fragment更新数据
+//        Message serialDataMsg = new Message();
+//        Bundle bundle = new Bundle();
+//        bundle.putFloatArray(Command.SERIAL_DATA_KEY,
+//                ArrayUtils.toPrimitive(normalData.toArray(new Float[]{})));
+//        serialDataMsg.setData(bundle);
 
-    public boolean hasLightData() {
-        return hasLightData;
-    }
 
-    public boolean hasDarkData() {
-        return hasDarkData;
-    }
 
-    // 获取亮度数据
-    public ArrayList<Float> getLightData() {
-        for (int i = 0; i < serialData.size(); i++) {
-            String name = (String) serialData.get(i).get(Command.SPECTRUM_ITEM_NAME_KEY);
-            if (name.equals(Command.LIGHT_DATA)) {
-                return (ArrayList<Float>) serialData.get(i).get(Command.SPECTRUM_ITEM_DATA_KEY);
-            }
-        }
-
-        return null;
-    }
-
-    // 获取暗度数据
-    public ArrayList<Float> getDarkData() {
-        for (int i = 0; i < serialData.size(); i++) {
-            String name = (String) serialData.get(i).get(Command.SPECTRUM_ITEM_NAME_KEY);
-            if (name.equals(Command.DARK_DATA)) {
-                return (ArrayList<Float>) serialData.get(i).get(Command.SPECTRUM_ITEM_DATA_KEY);
-            }
-        }
-
-        return null;
-    }
-
-    public List<Entry> getNormalSpectrumData() {
-        return normalSpectrumData;
-    }
-
-    public ArrayList<Float> getNormalData() {
-        return normalData;
+//        // 通知Fragment更新数据
+//        Message serialDataMsg = new Message();
+//        Bundle bundle = new Bundle();
+//        bundle.putParcelableArrayList(spectrumSerialData);
+//        serialDataMsg.setData(bundle);
     }
 
     // 向Fragment传递数据

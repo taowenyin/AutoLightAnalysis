@@ -37,7 +37,7 @@ public class Command {
     public static final String SPECTRUM_ITEM_SHOW_KEY = "Show";
 
     // 通过序列化和反序列化实现List的深度拷贝
-    public static ArrayList<Float> DeepCopy(ArrayList<Float> src) throws IOException, ClassNotFoundException {
+    public static ArrayList<Float> DeepCopyFloat(ArrayList<Float> src) throws IOException, ClassNotFoundException {
 
         // 序列化
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
@@ -49,6 +49,21 @@ public class Command {
         ObjectInputStream objectIn = new ObjectInputStream(byteIn);
 
         return (ArrayList<Float>) objectIn.readObject();
+    }
+
+    // 通过序列化和反序列化实现List的深度拷贝
+    public static ArrayList<Integer> DeepCopyInteger(ArrayList<Integer> src) throws IOException, ClassNotFoundException {
+
+        // 序列化
+        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+        ObjectOutputStream objectOut = new ObjectOutputStream(byteOut);
+        objectOut.writeObject(src);
+
+        // 反序列化
+        ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+        ObjectInputStream objectIn = new ObjectInputStream(byteIn);
+
+        return (ArrayList<Integer>) objectIn.readObject();
     }
 
 }
