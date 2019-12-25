@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -166,8 +167,16 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 // 收到经过计算后的数据
                 if (msg.what == CalculateAsyncTask.CALCULATE_DATA_MSG_KEY) {
-                    float[] data = msg.getData().getFloatArray(CalculateAsyncTask.CALCULATE_DATA_KEY);
-                    Log.i(TAG, String.valueOf(data.length));
+                    ArrayList<Float> data = new ArrayList<Float>(Arrays.asList(
+                            ArrayUtils.toObject(msg.getData().getFloatArray(CalculateAsyncTask.CALCULATE_DATA_KEY))));
+
+                    // 如果没有数据，那么就创建数据
+                    Map<String, Object> itemData = new HashMap<String, Object>();
+                    itemData.put(Command.SPECTRUM_ITEM_NAME_KEY, String.format(Command.NORMAL_DATA, spectrumSerialData.size() - 2));
+                    itemData.put(Command.SPECTRUM_ITEM_DATA_KEY, data);
+                    itemData.put(Command.SPECTRUM_ITEM_STATUS_KEY, false);
+                    itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, false);
+                    spectrumSerialData.add(itemData);
 
                     // 关闭进度对话框
                     if (dataPreprocessingDialog != null &&
