@@ -1,5 +1,6 @@
 package siso.edu.cn.autolightanalysis;
 
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
@@ -85,6 +86,13 @@ public class MainActivity extends AppCompatActivity implements
     // 亮和暗数据是否已经保存
     private boolean hasLightData = false, hasDarkData = false;
 
+    private AnalysisBaseInfoFragment analysisBaseInfoFragment = null;
+    private AnalysisSpectrumFragment analysisSpectrumFragment = null;
+    private AnalysisIndexFragment analysisIndexFragment = null;
+    private AnalysisPredictionFragment analysisPredictionFragment = null;
+    private PreferenceFragment preferenceFragment = null;
+    private AboutFragment aboutFragment = null;
+
     // TODO: 19-10-25
     // 接收到的光谱数据
     private ArrayList<Float> normalData = new ArrayList<Float>();
@@ -118,12 +126,15 @@ public class MainActivity extends AppCompatActivity implements
         analysisTableIndicators.add(this.getResources().getString(R.string.table_prediction_text));
         analysisTableIndicators.add(this.getResources().getString(R.string.table_preference_text));
         analysisTableIndicators.add(this.getResources().getString(R.string.table_about_text));
-        analysisFragments.add(AnalysisBaseInfoFragment.newInstance(this.getResources().getString(R.string.table_base_info_text)));
-        analysisFragments.add(AnalysisSpectrumFragment.newInstance(this.getResources().getString(R.string.table_spectrum_text)));
-        analysisFragments.add(AnalysisIndexFragment.newInstance(this.getResources().getString(R.string.table_index_text)));
-        analysisFragments.add(AnalysisPredictionFragment.newInstance(this.getResources().getString(R.string.table_prediction_text)));
-        analysisFragments.add(PreferenceFragment.newInstance(this.getResources().getString(R.string.table_preference_text)));
-        analysisFragments.add(AboutFragment.newInstance(this.getResources().getString(R.string.table_about_text)));
+
+
+
+        analysisFragments.add(this.analysisBaseInfoFragment = AnalysisBaseInfoFragment.newInstance(this.getResources().getString(R.string.table_base_info_text)));
+        analysisFragments.add(this.analysisSpectrumFragment = AnalysisSpectrumFragment.newInstance(this.getResources().getString(R.string.table_spectrum_text)));
+        analysisFragments.add(this.analysisIndexFragment = AnalysisIndexFragment.newInstance(this.getResources().getString(R.string.table_index_text)));
+        analysisFragments.add(this.analysisPredictionFragment = AnalysisPredictionFragment.newInstance(this.getResources().getString(R.string.table_prediction_text)));
+        analysisFragments.add(this.preferenceFragment = PreferenceFragment.newInstance(this.getResources().getString(R.string.table_preference_text)));
+        analysisFragments.add(this.aboutFragment = AboutFragment.newInstance(this.getResources().getString(R.string.table_about_text)));
 
         analysisContent.setAdapter(new AnalysisPageAdapter(getSupportFragmentManager(), analysisFragments, analysisTableIndicators));
         // 绑定标签页和标签页内容
@@ -170,9 +181,24 @@ public class MainActivity extends AppCompatActivity implements
                     ArrayList<Float> data = new ArrayList<Float>(Arrays.asList(
                             ArrayUtils.toObject(msg.getData().getFloatArray(CalculateAsyncTask.CALCULATE_DATA_KEY))));
 
+                    // 如果列表中已经有数据，那么就更新数据
+                    for (int i = 0; i < spectrumSerialData.size(); i++) {
+                        if (spectrumSerialData.get(i).get(Command.SPECTRUM_ITEM_NAME_KEY).equals(Command.NORMAL_DATA)) {
+                            spectrumSerialData.get(i).put(Command.SPECTRUM_ITEM_DATA_KEY, data);
+                            // 关闭进度对话框
+                            if (dataPreprocessingDialog != null &&
+                                    dataPreprocessingDialog.getDialog() != null &&
+                                    dataPreprocessingDialog.getDialog().isShowing()) {
+                                dataPreprocessingDialog.dismiss();
+                            }
+
+                            return;
+                        }
+                    }
+
                     // 如果没有数据，那么就创建数据
                     Map<String, Object> itemData = new HashMap<String, Object>();
-                    itemData.put(Command.SPECTRUM_ITEM_NAME_KEY, String.format(Command.NORMAL_DATA, spectrumSerialData.size() - 2));
+                    itemData.put(Command.SPECTRUM_ITEM_NAME_KEY, Command.NORMAL_DATA);
                     itemData.put(Command.SPECTRUM_ITEM_DATA_KEY, data);
                     itemData.put(Command.SPECTRUM_ITEM_STATUS_KEY, false);
                     itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, false);
@@ -187,6 +213,40 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
         };
+
+        analysisTable.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 1) {
+
+                }
+                if (tab.getPosition() == 2) {
+
+                    if (spectrumSerialData.size() == 3) {
+                        // 获取配置参数
+                        SharedPreferences preferences = getSharedPreferences(
+                                getResources().getString(R.string.preference_name), MODE_PRIVATE);
+
+                        // 计算指标
+                        analysisIndexFragment.calculateIndex(preferences, spectrumSerialData);
+                    } else {
+                        Toast.makeText(MainActivity.this,
+                                getResources().getString(R.string.preprocessing_no_data_text),
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
 
         connectDeviceBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

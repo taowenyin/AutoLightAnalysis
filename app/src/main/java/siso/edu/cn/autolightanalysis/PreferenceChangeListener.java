@@ -2,6 +2,7 @@ package siso.edu.cn.autolightanalysis;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.v7.preference.Preference;
 
 import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat;
 
@@ -46,6 +47,8 @@ public class PreferenceChangeListener implements SharedPreferences.OnSharedPrefe
             label = sharedPreferences.getString(key, context.getResources().getString(R.string.preference_uninitialized));
         }
 
-        preference.findPreference(key).setSummary(label);
+        if (preference.findPreference(key) != null) {
+            preference.findPreference(key).setSummary(label);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package siso.edu.cn.autolightanalysis;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 
 public class AnalysisIndexFragment extends Fragment {
@@ -44,12 +48,6 @@ public class AnalysisIndexFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_analysis_index, container, false);
     }
 
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -65,6 +63,26 @@ public class AnalysisIndexFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public void calculateIndex(SharedPreferences preferences, ArrayList<Map<String, Object>> spectrumData) {
+        for (int i = 0; i < spectrumData.size(); i++) {
+            if (spectrumData.get(i).get(Command.SPECTRUM_ITEM_NAME_KEY).equals(Command.NORMAL_DATA)) {
+                ArrayList<Float> data = (ArrayList<Float>) spectrumData.get(i).get(Command.SPECTRUM_ITEM_DATA_KEY);
+
+                String productType = preferences.getString(getResources().getString(R.string.preference_type_key), "-1");
+                boolean isPacking = preferences.getBoolean(getResources().getString(R.string.preference_is_packing_key), false);
+                String packingType = preferences.getString(getResources().getString(R.string.preference_packing_type_key), "-1");
+
+                return;
+            }
+        }
+    }
+
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
     }
 
     public interface OnFragmentInteractionListener {

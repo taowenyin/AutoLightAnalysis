@@ -81,18 +81,18 @@ public class AnalysisBaseInfoFragment extends PreferenceFragmentCompat {
 
         String key = getResources().getString(R.string.preference_type_key);
         String[] labelArray = getResources().getStringArray(R.array.product_type_array);
-        findPreference(key).setSummary(labelArray[Integer.valueOf(
-                getPreferenceManager().getSharedPreferences().getString(key, getResources().getString(R.string.preference_uninitialized)))]);
+        String value = getPreferenceManager().getSharedPreferences().getString(key, "-1");
+        findPreference(key).setSummary(value.equals("-1") ? getResources().getString(R.string.preference_uninitialized) : labelArray[Integer.valueOf(value)]);
 
         key = getResources().getString(R.string.preference_packing_type_key);
         labelArray = getResources().getStringArray(R.array.packing_type_array);
-        findPreference(key).setSummary(labelArray[Integer.valueOf(
-                getPreferenceManager().getSharedPreferences().getString(key, getResources().getString(R.string.preference_uninitialized)))]);
+        value = getPreferenceManager().getSharedPreferences().getString(key, "-1");
+        findPreference(key).setSummary(value.equals("-1") ? getResources().getString(R.string.preference_uninitialized) : labelArray[Integer.valueOf(value)]);
 
         key = getResources().getString(R.string.preference_packing_form_key);
         labelArray = getResources().getStringArray(R.array.packing_form_array);
-        findPreference(key).setSummary(labelArray[Integer.valueOf(
-                getPreferenceManager().getSharedPreferences().getString(key, getResources().getString(R.string.preference_uninitialized)))]);
+        value = getPreferenceManager().getSharedPreferences().getString(key, "-1");
+        findPreference(key).setSummary(value.equals("-1") ? getResources().getString(R.string.preference_uninitialized) : labelArray[Integer.valueOf(value)]);
     }
 
     @Override

@@ -21,7 +21,8 @@ public class Command {
 
     public static final String DARK_DATA = "Dark";
 
-    public static final String NORMAL_DATA = "Nor-%d";
+//    public static final String NORMAL_DATA = "Nor-%d";
+    public static final String NORMAL_DATA = "Normal";
 
     public static final String NORMAL_TMP_DATA = "Normal";
 

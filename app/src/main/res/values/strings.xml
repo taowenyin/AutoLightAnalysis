@@ -39,9 +39,9 @@
     </string-array>
     <string-array name="packing_type_array">
         <item>PE</item>
-        <item>PET</item>
-        <item>PA</item>
         <item>CPP</item>
+        <item>PA</item>
+        <item>PET</item>
         <item>PA/PE</item>
         <item>PA/CPP</item>
         <item>PET/CPP</item>
