@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -127,8 +128,6 @@ public class MainActivity extends AppCompatActivity implements
         analysisTableIndicators.add(this.getResources().getString(R.string.table_preference_text));
         analysisTableIndicators.add(this.getResources().getString(R.string.table_about_text));
 
-
-
         analysisFragments.add(this.analysisBaseInfoFragment = AnalysisBaseInfoFragment.newInstance(this.getResources().getString(R.string.table_base_info_text)));
         analysisFragments.add(this.analysisSpectrumFragment = AnalysisSpectrumFragment.newInstance(this.getResources().getString(R.string.table_spectrum_text)));
         analysisFragments.add(this.analysisIndexFragment = AnalysisIndexFragment.newInstance(this.getResources().getString(R.string.table_index_text)));
@@ -214,14 +213,19 @@ public class MainActivity extends AppCompatActivity implements
             }
         };
 
-        analysisTable.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        analysisContent.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getPosition() == 1) {
+            public void onPageScrolled(int i, float v, int i1) {
+                Log.i(TAG, "onPageScrolled i = " + i);
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                if (i == 1) {
 
                 }
-                if (tab.getPosition() == 2) {
-
+                // 切换到指标页
+                if (i == 2) {
                     // 获取配置参数
                     SharedPreferences preferences = getSharedPreferences(
                             getResources().getString(R.string.preference_name), MODE_PRIVATE);
@@ -241,12 +245,7 @@ public class MainActivity extends AppCompatActivity implements
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
+            public void onPageScrollStateChanged(int i) {
 
             }
         });
