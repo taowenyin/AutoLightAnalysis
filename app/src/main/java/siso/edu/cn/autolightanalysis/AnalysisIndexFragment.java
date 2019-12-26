@@ -8,9 +8,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -21,6 +23,10 @@ public class AnalysisIndexFragment extends Fragment {
     private String title = StringUtils.EMPTY;
 
     private OnFragmentInteractionListener mListener;
+
+    private TextView indexDmbTxt = null, indexOmbTxt = null, indexMmbTxt = null;
+
+    private View root = null;
 
     public AnalysisIndexFragment() {
         // Required empty public constructor
@@ -45,7 +51,15 @@ public class AnalysisIndexFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_analysis_index, container, false);
+        if (root == null) {
+            root = inflater.inflate(R.layout.fragment_analysis_index, container, false);
+
+            indexDmbTxt = root.findViewById(R.id.index_dmb_txt);
+            indexMmbTxt = root.findViewById(R.id.index_mmb_txt);
+            indexOmbTxt = root.findViewById(R.id.index_omb_txt);
+        }
+
+        return root;
     }
 
     @Override
@@ -70,11 +84,42 @@ public class AnalysisIndexFragment extends Fragment {
             if (spectrumData.get(i).get(Command.SPECTRUM_ITEM_NAME_KEY).equals(Command.NORMAL_DATA)) {
                 ArrayList<Float> data = (ArrayList<Float>) spectrumData.get(i).get(Command.SPECTRUM_ITEM_DATA_KEY);
 
-                String productType = preferences.getString(getResources().getString(R.string.preference_type_key), "-1");
+                int productType = Integer.valueOf(
+                        preferences.getString(getResources().getString(R.string.preference_type_key), "-1"));
                 boolean isPacking = preferences.getBoolean(getResources().getString(R.string.preference_is_packing_key), false);
-                String packingType = preferences.getString(getResources().getString(R.string.preference_packing_type_key), "-1");
+                int packingTypeIndex = Integer.valueOf(
+                        preferences.getString(getResources().getString(R.string.preference_packing_type_key), "-1"));
+                Algorithm.PackingType type = Algorithm.PackingType.values()[packingTypeIndex];
 
-                return;
+                double[] prediction = {3.15, 2.9, 267};
+
+                if (!isPacking) {
+                    if (productType == 0) {
+                        prediction = Algorithm.NoPacking.beefPrediction(
+                                data.get(525), data.get(545), data.get(565), data.get(572));
+                    }
+                    if (productType == 1) {
+                        prediction = Algorithm.NoPacking.porkPrediction(
+                                data.get(525), data.get(545), data.get(565), data.get(572));
+                    }
+                } else {
+                    if (productType == 0) {
+                        prediction = Algorithm.Packing.beefPrediction(
+                                data.get(525), data.get(545), data.get(565), data.get(572), type);
+                    }
+                }
+
+                // TODO: 19-12-26 测试用
+                prediction[0] = 3.25;
+                prediction[1] = 1.8888;
+                prediction[2] = 9.25846;
+
+                if (prediction != null) {
+                    DecimalFormat df = new DecimalFormat("0.00");
+                    indexDmbTxt.setText(df.format(prediction[0]));
+                    indexOmbTxt.setText(df.format(prediction[1]));
+                    indexMmbTxt.setText(df.format(prediction[2]));
+                }
             }
         }
     }

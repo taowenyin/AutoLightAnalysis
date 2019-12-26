@@ -222,11 +222,14 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 if (tab.getPosition() == 2) {
 
-                    if (spectrumSerialData.size() == 3) {
-                        // 获取配置参数
-                        SharedPreferences preferences = getSharedPreferences(
-                                getResources().getString(R.string.preference_name), MODE_PRIVATE);
+                    // 获取配置参数
+                    SharedPreferences preferences = getSharedPreferences(
+                            getResources().getString(R.string.preference_name), MODE_PRIVATE);
 
+                    if (spectrumSerialData.size() == 3 &&
+                            preferences.contains(getResources().getString(R.string.preference_type_key)) &&
+                            preferences.contains(getResources().getString(R.string.preference_is_packing_key)) &&
+                            preferences.contains(getResources().getString(R.string.preference_packing_type_key))) {
                         // 计算指标
                         analysisIndexFragment.calculateIndex(preferences, spectrumSerialData);
                     } else {
