@@ -218,7 +218,8 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onPageSelected(int i) {
                 if (i == 1) {
-
+                    // 更新图表
+                    analysisSpectrumFragment.updateSpectrumData(spectrumSerialData);
                 }
                 // 切换到指标页
                 if (i == 2) {

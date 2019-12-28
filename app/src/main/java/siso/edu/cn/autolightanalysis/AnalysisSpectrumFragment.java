@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,8 @@ import java.util.Map;
 
 
 public class AnalysisSpectrumFragment extends Fragment {
+    public static final String TAG = "===AnalysisSpectrumFragment===";
+
     private static final String ARG_PARAM_TITLE = "title";
 
     private Context context = null;
@@ -297,6 +300,36 @@ public class AnalysisSpectrumFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public void updateSpectrumData(ArrayList<Map<String, Object>> spectrumSerialData) {
+        for (int i = 0; i < spectrumSerialData.size(); i++) {
+            Map<String, Object> lineData = spectrumSerialData.get(i);
+            String name = (String) lineData.get(Command.SPECTRUM_ITEM_NAME_KEY);
+            boolean status = (boolean) lineData.get(Command.SPECTRUM_ITEM_STATUS_KEY);
+            boolean isShow = (boolean) lineData.get(Command.SPECTRUM_ITEM_SHOW_KEY);
+
+            ArrayList<Entry> spectrumLine = new ArrayList<Entry>();
+
+            if (!name.equals(Command.NORMAL_DATA)) {
+                ArrayList<Integer> data = (ArrayList<Integer>) lineData.get(Command.SPECTRUM_ITEM_DATA_KEY);
+                for (int j = 0; j < data.size(); j++) {
+                    Entry entry = new Entry();
+                    entry.setX(j);
+                    int value = data.get(j).intValue();
+                    entry.setY((float) value);
+                    spectrumLine.add(entry);
+                }
+            } else {
+                ArrayList<Float> data = (ArrayList<Float>) lineData.get(Command.SPECTRUM_ITEM_DATA_KEY);
+                for (int j = 0; j < data.size(); j++) {
+                    Entry entry = new Entry(j, data.get(j));
+                    spectrumLine.add(entry);
+                }
+            }
+
+            Log.i(TAG, "");
+        }
     }
 
     private void addNewSpectrumLine(Map<String, Object> spectrumDataMap) {
