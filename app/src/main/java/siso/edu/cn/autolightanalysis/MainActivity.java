@@ -36,14 +36,10 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements
         UartDeviceCallback,
-        AnalysisBaseInfoFragment.OnFragmentInteractionListener,
         AnalysisSpectrumFragment.OnFragmentInteractionListener,
         AnalysisSpectrumFragment.OnHasDarkDataListener,
         AnalysisSpectrumFragment.OnHasLightDataListener,
-        AnalysisIndexFragment.OnFragmentInteractionListener,
-        AnalysisPredictionFragment.OnFragmentInteractionListener,
-        PreferenceFragment.OnFragmentInteractionListener,
-        AboutFragment.OnFragmentInteractionListener {
+        PreferenceFragment.OnFragmentInteractionListener {
 
     public static final String TAG = "===MainActivity===";
     private static final String UART_DEVICE_NAME = "UART0";

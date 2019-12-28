@@ -16,8 +16,6 @@ public class AnalysisPredictionFragment extends Fragment {
 
     private String title = StringUtils.EMPTY;
 
-    private OnFragmentInteractionListener mListener;
-
     public AnalysisPredictionFragment() {
         // Required empty public constructor
     }
@@ -44,30 +42,13 @@ public class AnalysisPredictionFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_analysis_prediction, container, false);
     }
 
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
-    }
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 }

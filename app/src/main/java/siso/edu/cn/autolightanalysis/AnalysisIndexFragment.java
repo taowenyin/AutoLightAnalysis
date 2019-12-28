@@ -22,8 +22,6 @@ public class AnalysisIndexFragment extends Fragment {
 
     private String title = StringUtils.EMPTY;
 
-    private OnFragmentInteractionListener mListener;
-
     private TextView indexDmbTxt = null, indexOmbTxt = null, indexMmbTxt = null;
 
     private View root = null;
@@ -57,6 +55,11 @@ public class AnalysisIndexFragment extends Fragment {
             indexDmbTxt = root.findViewById(R.id.index_dmb_txt);
             indexMmbTxt = root.findViewById(R.id.index_mmb_txt);
             indexOmbTxt = root.findViewById(R.id.index_omb_txt);
+        } else {
+            ViewGroup parent = (ViewGroup) root.getParent();
+            if (parent != null) {
+                parent.removeView(root);
+            }
         }
 
         return root;
@@ -65,18 +68,11 @@ public class AnalysisIndexFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     public void calculateIndex(SharedPreferences preferences, ArrayList<Map<String, Object>> spectrumData) {
@@ -122,15 +118,5 @@ public class AnalysisIndexFragment extends Fragment {
                 }
             }
         }
-    }
-
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 }

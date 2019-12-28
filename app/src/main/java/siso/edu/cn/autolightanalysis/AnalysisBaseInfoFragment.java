@@ -15,8 +15,6 @@ public class AnalysisBaseInfoFragment extends PreferenceFragmentCompat {
 
     private String title = StringUtils.EMPTY;
 
-    private OnFragmentInteractionListener mListener;
-
     // Preference监听
     private PreferenceChangeListener preferenceListener = null;
 
@@ -49,29 +47,15 @@ public class AnalysisBaseInfoFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.base, rootKey);
     }
 
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-
-            preferenceListener = new PreferenceChangeListener(getContext(), this);
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
+        preferenceListener = new PreferenceChangeListener(getContext(), this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     @Override
@@ -99,10 +83,5 @@ public class AnalysisBaseInfoFragment extends PreferenceFragmentCompat {
     public void onPause() {
         super.onPause();
         getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(preferenceListener);
-    }
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 }
