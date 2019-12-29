@@ -38,7 +38,6 @@ public class AnalysisSpectrumFragment extends Fragment {
     private String title = StringUtils.EMPTY;
 
     private OnFragmentMonitorListener mListener = null;
-    private MainActivity mainActivity = null;
 
     private LineChart spectrumLineChart = null;
     private ListView spectrumList = null;
@@ -74,9 +73,6 @@ public class AnalysisSpectrumFragment extends Fragment {
         if (getArguments() != null) {
             title = getArguments().getString(ARG_PARAM_TITLE);
         }
-
-        // 传递Handler
-        mainActivity = (MainActivity) context;
     }
 
     @Override
@@ -322,39 +318,10 @@ public class AnalysisSpectrumFragment extends Fragment {
         return spectrumSet;
     }
 
-    private void removeSpectrumLine(Map<String, Object> spectrumDataMap) {
-        // 获取数据名称
-        String spectrumName = (String) spectrumDataMap.get(Command.SPECTRUM_ITEM_NAME_KEY);
-        // 获取要删除的数据集
-        ILineDataSet dataSet = spectrumLineChart.getData().getDataSetByLabel(spectrumName, true);
-        // 删除数据集
-        spectrumLineChart.getData().removeDataSet(dataSet);
-
-        // 显示数据
-        spectrumLineChart.getData().notifyDataChanged();
-        spectrumLineChart.notifyDataSetChanged();
-        spectrumLineChart.invalidate();
-
-        // 修改显示状态
-        spectrumDataMap.put(Command.SPECTRUM_ITEM_SHOW_KEY, false);
-    }
-
-    public LineChart getSpectrumLineChart() {
-        return spectrumLineChart;
-    }
-
     public interface OnFragmentMonitorListener {
         void onUpdateSpectrumItemShow(int position, boolean isShow);
         void onUpdateSpectrumItemChecked(int position, boolean checked);
         void onUpdateSpectrumUndo();
         void onUpdateSpectrumItemDelete();
-    }
-
-    public interface OnHasDarkDataListener {
-        void OnHasDarkData(boolean hasDarkData);
-    }
-
-    public interface OnHasLightDataListener {
-        void OnHasLightData(boolean hasLightData);
     }
 }

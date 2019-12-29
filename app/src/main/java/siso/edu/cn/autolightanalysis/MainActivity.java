@@ -17,7 +17,6 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.google.android.things.pio.PeripheralManager;
@@ -37,8 +36,6 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity implements
         UartDeviceCallback,
         AnalysisSpectrumFragment.OnFragmentMonitorListener,
-        AnalysisSpectrumFragment.OnHasDarkDataListener,
-        AnalysisSpectrumFragment.OnHasLightDataListener,
         PreferenceFragment.OnFragmentInteractionListener {
 
     public static final String TAG = "===MainActivity===";
@@ -463,6 +460,52 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 } else {
                     // 接收数据正确后才可以操作
+                    serialDataBuffer.clear();
+
+                    SharedPreferences preferences = getSharedPreferences(
+                            getResources().getString(R.string.preference_name), MODE_PRIVATE);
+                    int integrationTime = Integer.valueOf(
+                            preferences.getString(getResources().getString(R.string.preference_integration_time_key), "-1"));
+                    String cmd = Command.SET_INTEGRATION_TIME + String.format("%04d;", integrationTime);
+                    // 发送读取光谱的指令
+                    uartDevice.write(cmd.getBytes(), cmd.getBytes().length);
+                    // 设置当前指令类型
+                    currentCommand = Command.SET_INTEGRATION_TIME;
+                }
+            }
+
+            if (Command.SET_INTEGRATION_TIME.equals(currentCommand)) {
+                if (serialDataBuffer.size() == Command.MAX_INTEGRATION_DATA_LENGTH) {
+                    // 接收数据正确后才可以操作
+                    serialDataBuffer.clear();
+
+                    SharedPreferences preferences = getSharedPreferences(
+                            getResources().getString(R.string.preference_name), MODE_PRIVATE);
+
+                    boolean isSmooth = preferences.getBoolean(
+                            getResources().getString(R.string.preference_smooth_key), false);
+                    int smoothCount = Integer.valueOf(
+                            preferences.getString(getResources().getString(R.string.preference_smooth_count_key), "-1"));
+
+                    // TODO: 19-12-30
+//                    if (isSmooth) {
+//                        String cmd = Command.SET_SMOOTH + String.format("%02d;", smoothCount);
+//
+//                        // 发送读取光谱的指令
+//                        uartDevice.write(cmd.getBytes(), cmd.getBytes().length);
+//                        // 设置当前指令类型
+//                        currentCommand = Command.SET_SMOOTH;
+//                    }
+
+                    // 接收数据正确后才可以操作
+                    isSysReady = true;
+                    serialDataBuffer.clear();
+                }
+            }
+
+            if (Command.SET_SMOOTH.equals(currentCommand)) {
+                if (serialDataBuffer.size() == Command.MAX_SMOOTH_DATA_LENGTH) {
+                    // 接收数据正确后才可以操作
                     isSysReady = true;
                     serialDataBuffer.clear();
                 }
@@ -538,16 +581,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onUartDeviceError(UartDevice uart, int error) {
         Log.w(TAG, uart + ": Error event " + error);
-    }
-
-    @Override
-    public void OnHasDarkData(boolean hasDarkData) {
-        this.hasDarkData = hasDarkData;
-    }
-
-    @Override
-    public void OnHasLightData(boolean hasLightData) {
-        this.hasLightData = hasLightData;
     }
 
     @Override

@@ -11,20 +11,23 @@ public class Command {
     // 最大光谱数据长度
     public static final int MAX_SPECTRUM_DATA_LENGTH = 4096;
     public static final int MAX_TEMPERATURE_DATA_LENGTH = 2;
+    public static final int MAX_INTEGRATION_DATA_LENGTH = 1;
+    public static final int MAX_SMOOTH_DATA_LENGTH = 1;
 
     // 读取设备内部温度指令
     public static final String READ_INTERNAL_TEMPERATURE = "R;";
     // 读取光谱指令
     public static final String READ_SPECTRUM = "S;";
+    // 设置积分时间
+    public static final String SET_INTEGRATION_TIME = "i";
+    // 设置滑动平均
+    public static final String SET_SMOOTH = "B";
 
     public static final String LIGHT_DATA = "Light";
 
     public static final String DARK_DATA = "Dark";
 
-//    public static final String NORMAL_DATA = "Nor-%d";
     public static final String NORMAL_DATA = "Normal";
-
-    public static final String NORMAL_TMP_DATA = "Normal";
 
     // 串口数据
     public static final String SERIAL_DATA_KEY = "SerialData";
