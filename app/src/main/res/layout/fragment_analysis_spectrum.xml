@@ -7,7 +7,7 @@
     tools:context=".AnalysisSpectrumFragment">
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="@dimen/spectrum_list_width"
         android:layout_height="match_parent">
 
         <ListView

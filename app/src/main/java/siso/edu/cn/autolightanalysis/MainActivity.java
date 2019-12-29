@@ -36,7 +36,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements
         UartDeviceCallback,
-        AnalysisSpectrumFragment.OnFragmentInteractionListener,
+        AnalysisSpectrumFragment.OnFragmentMonitorListener,
         AnalysisSpectrumFragment.OnHasDarkDataListener,
         AnalysisSpectrumFragment.OnHasLightDataListener,
         PreferenceFragment.OnFragmentInteractionListener {
@@ -77,8 +77,6 @@ public class MainActivity extends AppCompatActivity implements
     private boolean isSysReady = false;
     // 串口接收数据
     private Handler serialHandler = null;
-    // 向标签页发送实时串口数据对象
-    private Handler handler = null;
 
     // 亮和暗数据是否已经保存
     private boolean hasLightData = false, hasDarkData = false;
@@ -196,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements
                     itemData.put(Command.SPECTRUM_ITEM_NAME_KEY, Command.NORMAL_DATA);
                     itemData.put(Command.SPECTRUM_ITEM_DATA_KEY, data);
                     itemData.put(Command.SPECTRUM_ITEM_STATUS_KEY, false);
-                    itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, false);
+                    itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, true);
                     spectrumSerialData.add(itemData);
 
                     // 关闭进度对话框
@@ -330,7 +328,7 @@ public class MainActivity extends AppCompatActivity implements
                     itemData.put(Command.SPECTRUM_ITEM_NAME_KEY, Command.LIGHT_DATA);
                     itemData.put(Command.SPECTRUM_ITEM_DATA_KEY, data);
                     itemData.put(Command.SPECTRUM_ITEM_STATUS_KEY, false);
-                    itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, false);
+                    itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, true);
                     spectrumSerialData.add(itemData);
 
                     updateSpectrumView(spectrumSerialData);
@@ -378,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements
                     itemData.put(Command.SPECTRUM_ITEM_NAME_KEY, Command.DARK_DATA);
                     itemData.put(Command.SPECTRUM_ITEM_DATA_KEY, data);
                     itemData.put(Command.SPECTRUM_ITEM_STATUS_KEY, false);
-                    itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, false);
+                    itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, true);
                     spectrumSerialData.add(itemData);
 
                     updateSpectrumView(spectrumSerialData);
@@ -491,31 +489,6 @@ public class MainActivity extends AppCompatActivity implements
 //        serialDataMsg.setData(bundle);
     }
 
-    // 向Fragment传递数据
-    public void setFragmentSerialData() {
-        if (handler != null) {
-            // 通知Fragment更新数据
-            Message serialDataMsg = new Message();
-            Bundle bundle = new Bundle();
-            bundle.putFloatArray(Command.SERIAL_DATA_KEY,
-                    ArrayUtils.toPrimitive(normalData.toArray(new Float[]{})));
-            serialDataMsg.setData(bundle);
-
-            handler.sendMessage(serialDataMsg);
-        }
-    }
-
-    // TODO: 19-10-20 要改
-    public LineChart getSpectrumLineChart() {
-//         return spectrumLineChart;
-        return null;
-    }
-
-    // 获取Fragment的Handler
-    public void setHandler(Handler handler) {
-        this.handler = handler;
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -568,11 +541,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
     public void OnHasDarkData(boolean hasDarkData) {
         this.hasDarkData = hasDarkData;
     }
@@ -580,5 +548,48 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void OnHasLightData(boolean hasLightData) {
         this.hasLightData = hasLightData;
+    }
+
+    @Override
+    public void onUpdateSpectrumItemShow(int position, boolean isShow) {
+        spectrumSerialData.get(position).put(Command.SPECTRUM_ITEM_SHOW_KEY, isShow);
+        // 更新图表
+        analysisSpectrumFragment.updateSpectrumData(spectrumSerialData);
+    }
+
+    @Override
+    public void onUpdateSpectrumItemChecked(int position, boolean checked) {
+        spectrumSerialData.get(position).put(Command.SPECTRUM_ITEM_STATUS_KEY, checked);
+        // 更新图表
+        analysisSpectrumFragment.updateSpectrumData(spectrumSerialData);
+    }
+
+    @Override
+    public void onUpdateSpectrumUndo() {
+        for (int i = 0; i < spectrumSerialData.size(); i++) {
+            spectrumSerialData.get(i).put(Command.SPECTRUM_ITEM_STATUS_KEY, false);
+        }
+        // 更新图表
+        analysisSpectrumFragment.updateSpectrumData(spectrumSerialData);
+    }
+
+    @Override
+    public void onUpdateSpectrumItemDelete() {
+        ArrayList<Map<String, Object>> deleteList = new ArrayList<Map<String, Object>>();
+
+        for (int i = 0;i < spectrumSerialData.size(); i++) {
+            boolean delete = (boolean) spectrumSerialData.get(i).get(Command.SPECTRUM_ITEM_STATUS_KEY);
+            if (delete) {
+                deleteList.add(spectrumSerialData.get(i));
+            }
+        }
+        spectrumSerialData.removeAll(deleteList);
+        // 更新图表
+        analysisSpectrumFragment.updateSpectrumData(spectrumSerialData);
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }

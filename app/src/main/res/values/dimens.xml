@@ -19,6 +19,8 @@
     <dimen name="spectrum_item_v_padding">2dp</dimen>
     <!--光谱列表的分隔线高度-->
     <dimen name="spectrum_item_divider_height">2dp</dimen>
+    <!--光谱列表的宽度-->
+    <dimen name="spectrum_list_width">80dp</dimen>
     <!--按钮的高度-->
     <dimen name="button_height">40dp</dimen>
     <!--按钮的内边距-->
