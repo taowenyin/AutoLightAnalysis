@@ -11,6 +11,7 @@ public class Command {
     // 最大光谱数据长度
     public static final int MAX_SPECTRUM_DATA_LENGTH = 4096;
     public static final int MAX_TEMPERATURE_DATA_LENGTH = 2;
+    public static final int MAX_TRIGGER_DATA_LENGTH = 1;
     public static final int MAX_INTEGRATION_DATA_LENGTH = 1;
     public static final int MAX_SMOOTH_DATA_LENGTH = 1;
 
@@ -20,6 +21,8 @@ public class Command {
     public static final String READ_SPECTRUM = "S;";
     // 设置积分时间
     public static final String SET_INTEGRATION_TIME = "i";
+    // 软件触发
+    public static final String SET_TRIGGER_MODE = "T01;";
     // 设置滑动平均
     public static final String SET_SMOOTH = "B";
 
