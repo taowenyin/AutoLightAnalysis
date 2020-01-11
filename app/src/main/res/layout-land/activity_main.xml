@@ -16,18 +16,6 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <ToggleButton
-            android:id="@+id/connect_device_btn"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="@dimen/button_height"
-            android:minHeight="@dimen/button_mini_size"
-            android:minWidth="@dimen/button_mini_size"
-            android:checked="false"
-            android:textOn="@string/connect_serial_toggle_on_label"
-            android:textOff="@string/connect_serial_toggle_off_label"
-            android:textSize="@dimen/activity_font_size"/>
-
         <Button
             android:id="@+id/save_light_spectrum_btn"
             android:layout_width="0dp"
@@ -35,7 +23,6 @@
             android:layout_height="@dimen/button_height"
             android:minHeight="@dimen/button_mini_size"
             android:minWidth="@dimen/button_mini_size"
-            android:enabled="false"
             android:text="@string/save_light_spectrum_label"
             android:textSize="@dimen/activity_font_size"/>
 
@@ -46,7 +33,6 @@
             android:layout_height="@dimen/button_height"
             android:minHeight="@dimen/button_mini_size"
             android:minWidth="@dimen/button_mini_size"
-            android:enabled="false"
             android:text="@string/save_dark_spectrum_label"
             android:textSize="@dimen/activity_font_size"/>
 
@@ -57,7 +43,6 @@
             android:layout_height="@dimen/button_height"
             android:minHeight="@dimen/button_mini_size"
             android:minWidth="@dimen/button_mini_size"
-            android:enabled="false"
             android:text="@string/read_spectrum_label"
             android:textSize="@dimen/activity_font_size"/>
 

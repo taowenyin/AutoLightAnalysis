@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements
     private static final String UART_DEVICE_NAME = "UART0";
 
     // 顶部工具栏
-    private ToggleButton connectDeviceBtn = null;
     private Button saveLightSpectrumBtn = null;
     private Button saveDarkSpectrumBtn = null;
     private Button readSpectrumBtn = null;
@@ -100,7 +99,6 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        connectDeviceBtn = findViewById(R.id.connect_device_btn);
         saveLightSpectrumBtn = findViewById(R.id.save_light_spectrum_btn);
         saveDarkSpectrumBtn = findViewById(R.id.save_dark_spectrum_btn);
         readSpectrumBtn = findViewById(R.id.read_spectrum_btn);
@@ -242,51 +240,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        connectDeviceBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    try {
-                        // 打开串口
-                        uartDevice = manager.openUartDevice(UART_DEVICE_NAME);
-                        // 配置串口
-                        configureUartFrame(uartDevice);
-                        // 注册串口接收的回调函数
-                        uartDevice.registerUartDeviceCallback(MainActivity.this);
-                        // 打开串口后使能其他功能
-                        saveLightSpectrumBtn.setEnabled(true);
-                        saveDarkSpectrumBtn.setEnabled(true);
-                        readSpectrumBtn.setEnabled(true);
-
-                        try {
-                            // 读取串口数据时清空串口缓存数据
-                            serialDataBuffer.clear();
-                            // 发送读取光谱的指令，解决开机时数据错误的问题
-                            uartDevice.write(Command.READ_INTERNAL_TEMPERATURE.getBytes(), Command.READ_INTERNAL_TEMPERATURE.getBytes().length);
-                            // 设置当前指令类型
-                            currentCommand = Command.READ_INTERNAL_TEMPERATURE;
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } catch (IOException e) {
-                        Log.w(TAG, "Unable to access UART device", e);
-                    }
-                } else {
-                    try {
-                        // 关闭串口
-                        uartDevice.unregisterUartDeviceCallback(MainActivity.this);
-                        uartDevice.close();
-                        // 打开串口后使能其他功能
-                        saveLightSpectrumBtn.setEnabled(false);
-                        saveDarkSpectrumBtn.setEnabled(false);
-                        readSpectrumBtn.setEnabled(false);
-                    } catch (IOException e) {
-                        Log.w(TAG, "Unable to close UART device", e);
-                    }
-                }
-            }
-        });
-
         saveLightSpectrumBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -386,23 +339,10 @@ public class MainActivity extends AppCompatActivity implements
         readSpectrumBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!isSysReady) {
-                    Toast.makeText(MainActivity.this,
-                            getResources().getString(R.string.preprocessing_adjust_system_text),
-                            Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                try {
-                    // 读取串口数据时清空串口缓存数据
-                    serialDataBuffer.clear();
-                    // 发送读取光谱的指令
-                    uartDevice.write(Command.READ_SPECTRUM.getBytes(), Command.READ_SPECTRUM.getBytes().length);
-                    // 设置当前指令类型
-                    currentCommand = Command.READ_SPECTRUM;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                // 关闭串口
+                closeUart();
+                // 打开串口
+                openUart();
             }
         });
 
@@ -412,6 +352,47 @@ public class MainActivity extends AppCompatActivity implements
                 MainActivity.this.finish();
             }
         });
+    }
+
+    // 打开串口
+    private void openUart() {
+        if (uartDevice == null) {
+            try {
+                // 打开串口
+                uartDevice = manager.openUartDevice(UART_DEVICE_NAME);
+                // 配置串口
+                configureUartFrame(uartDevice);
+                // 注册串口接收的回调函数
+                uartDevice.registerUartDeviceCallback(MainActivity.this);
+
+                try {
+                    // 读取串口数据时清空串口缓存数据
+                    serialDataBuffer.clear();
+                    // 发送读取光谱的指令，解决开机时数据错误的问题
+                    uartDevice.write(Command.READ_INTERNAL_TEMPERATURE.getBytes(), Command.READ_INTERNAL_TEMPERATURE.getBytes().length);
+                    // 设置当前指令类型
+                    currentCommand = Command.READ_INTERNAL_TEMPERATURE;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch (IOException e) {
+                Log.w(TAG, "Unable to access UART device", e);
+            }
+        }
+    }
+
+    // 关闭串口
+    private void closeUart() {
+        try {
+            if (uartDevice != null) {
+                // 关闭串口
+                uartDevice.unregisterUartDeviceCallback(MainActivity.this);
+                uartDevice.close();
+                uartDevice = null;
+            }
+        } catch (IOException e) {
+            Log.w(TAG, "Unable to close UART device", e);
+        }
     }
 
     // 串口配置
@@ -479,34 +460,23 @@ public class MainActivity extends AppCompatActivity implements
                     // 接收数据正确后才可以操作
                     serialDataBuffer.clear();
 
-                    SharedPreferences preferences = getSharedPreferences(
-                            getResources().getString(R.string.preference_name), MODE_PRIVATE);
-
-                    boolean isSmooth = preferences.getBoolean(
-                            getResources().getString(R.string.preference_smooth_key), false);
-                    int smoothCount = Integer.valueOf(
-                            preferences.getString(getResources().getString(R.string.preference_smooth_count_key), "-1"));
-
-                    // TODO: 19-12-30
-//                    if (isSmooth) {
-//                        String cmd = Command.SET_SMOOTH + String.format("%02d;", smoothCount);
-//
-//                        // 发送读取光谱的指令
-//                        uartDevice.write(cmd.getBytes(), cmd.getBytes().length);
-//                        // 设置当前指令类型
-//                        currentCommand = Command.SET_SMOOTH;
-//                    }
-
-                    // 接收数据正确后才可以操作
+                    // 系统准备完毕
                     isSysReady = true;
-                    serialDataBuffer.clear();
+
+                    try {
+                        // 发送读取光谱的指令
+                        uartDevice.write(Command.READ_SPECTRUM.getBytes(), Command.READ_SPECTRUM.getBytes().length);
+                        // 设置当前指令类型
+                        currentCommand = Command.READ_SPECTRUM;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
             if (Command.SET_SMOOTH.equals(currentCommand)) {
                 if (serialDataBuffer.size() == Command.MAX_SMOOTH_DATA_LENGTH) {
                     // 接收数据正确后才可以操作
-                    isSysReady = true;
                     serialDataBuffer.clear();
                 }
             }

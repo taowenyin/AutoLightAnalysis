@@ -92,16 +92,16 @@ public class AnalysisIndexFragment extends Fragment {
                 if (!isPacking) {
                     if (productType == 0) {
                         prediction = Algorithm.NoPacking.beefPrediction(
-                                data.get(525), data.get(545), data.get(565), data.get(572));
+                                data.get(698), data.get(741), data.get(785), data.get(800));
                     }
                     if (productType == 1) {
                         prediction = Algorithm.NoPacking.porkPrediction(
-                                data.get(525), data.get(545), data.get(565), data.get(572));
+                                data.get(698), data.get(741), data.get(785), data.get(800));
                     }
                 } else {
                     if (productType == 0) {
                         prediction = Algorithm.Packing.beefPrediction(
-                                data.get(525), data.get(545), data.get(565), data.get(572), type);
+                                data.get(698), data.get(741), data.get(785), data.get(800), type);
                     }
                 }
 

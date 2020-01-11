@@ -23,6 +23,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -238,14 +239,15 @@ public class AnalysisSpectrumFragment extends Fragment {
             if (name.equals(Command.NORMAL_DATA)) {
                 ArrayList<Float> data = (ArrayList<Float>) lineData.get(Command.SPECTRUM_ITEM_DATA_KEY);
                 for (int j = 0; j < data.size(); j++) {
-                    Entry entry = new Entry((float) (195.52 + 0.44 * j), data.get(j).floatValue());
+                    DecimalFormat df = new DecimalFormat("0.00");
+                    Entry entry = new Entry(Command.SPECTRUM_X[j], Float.valueOf(df.format(data.get(j).floatValue())));
                     spectrumLine.add(entry);
                 }
             } else {
                 ArrayList<Integer> data = (ArrayList<Integer>) lineData.get(Command.SPECTRUM_ITEM_DATA_KEY);
                 for (int j = 0; j < data.size(); j++) {
                     Entry entry = new Entry();
-                    entry.setX((float) (195.52 + 0.44 * j));
+                    entry.setX(Command.SPECTRUM_X[j]);
                     int value = data.get(j).intValue();
                     entry.setY((float) value);
                     spectrumLine.add(entry);
