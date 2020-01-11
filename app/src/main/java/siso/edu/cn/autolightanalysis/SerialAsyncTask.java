@@ -38,13 +38,11 @@ public class SerialAsyncTask extends AsyncTask<Byte, Void, Void> {
         serialData.clear();
 
         // 填充数据集
-        for (int i = 0, j = 0; i < spectrumData.length; i += 4, j++) {
+        for (int i = 0, j = 0; i < spectrumData.length; i += 2, j++) {
             byte byte0 = spectrumData[i];
             byte byte1 = spectrumData[i + 1];
-            byte byte2 = spectrumData[i + 2];
-            byte byte3 = spectrumData[i + 3];
 
-            Integer itemData = ((byte3 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte1 & 0xFF) << 8) | ((byte0 & 0xFF));
+            Integer itemData = ((byte1 & 0xFF) << 8) | ((byte0 & 0xFF));
             serialData.add(itemData);
         }
 
