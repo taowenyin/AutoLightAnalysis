@@ -325,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements
                     itemData.put(Command.SPECTRUM_ITEM_NAME_KEY, Command.LIGHT_DATA);
                     itemData.put(Command.SPECTRUM_ITEM_DATA_KEY, data);
                     itemData.put(Command.SPECTRUM_ITEM_STATUS_KEY, false);
-                    itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, true);
+                    itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, false);
                     spectrumSerialData.add(itemData);
 
                     updateSpectrumView(spectrumSerialData);
@@ -373,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements
                     itemData.put(Command.SPECTRUM_ITEM_NAME_KEY, Command.DARK_DATA);
                     itemData.put(Command.SPECTRUM_ITEM_DATA_KEY, data);
                     itemData.put(Command.SPECTRUM_ITEM_STATUS_KEY, false);
-                    itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, true);
+                    itemData.put(Command.SPECTRUM_ITEM_SHOW_KEY, false);
                     spectrumSerialData.add(itemData);
 
                     updateSpectrumView(spectrumSerialData);

@@ -132,7 +132,7 @@ public class AnalysisSpectrumFragment extends Fragment {
                 @Override
                 public String getFormattedValue(float value) {
                     // TODO: 19-12-29 根据实际情况修改
-                    return String.valueOf(value / 100000 + "万");
+                    return String.valueOf(value);
                 }
             });
             // 设置数据
@@ -235,19 +235,19 @@ public class AnalysisSpectrumFragment extends Fragment {
             boolean status = (boolean) lineData.get(Command.SPECTRUM_ITEM_STATUS_KEY);
 
             ArrayList<Entry> spectrumLine = new ArrayList<Entry>();
-            if (!name.equals(Command.NORMAL_DATA)) {
-                ArrayList<Integer> data = (ArrayList<Integer>) lineData.get(Command.SPECTRUM_ITEM_DATA_KEY);
+            if (name.equals(Command.NORMAL_DATA)) {
+                ArrayList<Float> data = (ArrayList<Float>) lineData.get(Command.SPECTRUM_ITEM_DATA_KEY);
                 for (int j = 0; j < data.size(); j++) {
-                    Entry entry = new Entry();
-                    entry.setX(j);
-                    int value = data.get(j).intValue();
-                    entry.setY((float) value);
+                    Entry entry = new Entry((float) (195.52 + 0.44 * j), data.get(j).floatValue());
                     spectrumLine.add(entry);
                 }
             } else {
-                ArrayList<Float> data = (ArrayList<Float>) lineData.get(Command.SPECTRUM_ITEM_DATA_KEY);
+                ArrayList<Integer> data = (ArrayList<Integer>) lineData.get(Command.SPECTRUM_ITEM_DATA_KEY);
                 for (int j = 0; j < data.size(); j++) {
-                    Entry entry = new Entry(j, data.get(j));
+                    Entry entry = new Entry();
+                    entry.setX((float) (195.52 + 0.44 * j));
+                    int value = data.get(j).intValue();
+                    entry.setY((float) value);
                     spectrumLine.add(entry);
                 }
             }

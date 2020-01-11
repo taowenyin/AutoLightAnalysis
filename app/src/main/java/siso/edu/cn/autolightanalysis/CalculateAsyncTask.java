@@ -43,10 +43,14 @@ public class CalculateAsyncTask extends AsyncTask<Integer, Void, Void> {
 
         if (lightData != null && darkData != null) {
             for (int i = 0; i < lightData.size(); i++) {
-                int light = lightData.get(i);
-                int dark = darkData.get(i);
+                float value = 0f;
 
-                Float value = (float) (light - integers[i]) / (light - dark);
+                if (i >= 280 && i <= 1990) {
+                    int light = lightData.get(i);
+                    int dark = darkData.get(i);
+
+                    value = Math.abs((float) (integers[i] - dark) / (light - dark));
+                }
                 calculateData.add(value);
             }
 

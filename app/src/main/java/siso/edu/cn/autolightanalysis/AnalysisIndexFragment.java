@@ -105,11 +105,6 @@ public class AnalysisIndexFragment extends Fragment {
                     }
                 }
 
-                // TODO: 19-12-26 测试用
-                prediction[0] = 3.25;
-                prediction[1] = 1.8888;
-                prediction[2] = 9.25846;
-
                 if (prediction != null) {
                     DecimalFormat df = new DecimalFormat("0.00");
                     indexDmbTxt.setText(df.format(prediction[0]));
